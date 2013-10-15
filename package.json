@@ -1,0 +1,37 @@
+{
+  "name": "effroi",
+  "version": "0.0.0",
+  "description": "",
+  "main": "Gruntfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/francejs/effroi.git"
+  },
+  "author": "Raphaël Rougeron, Nicolas Froidure",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/francejs/effroi/issues"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-clean": "~0.5.0",
+    "browserify": "~2.33.1",
+    "grunt-browserify": "~1.2.8",
+    "karma-script-launcher": "~0.1.0",
+    "karma-chrome-launcher": "~0.1.0",
+    "karma-firefox-launcher": "~0.1.0",
+    "karma-html2js-preprocessor": "~0.1.0",
+    "karma-jasmine": "~0.1.3",
+    "karma-requirejs": "~0.1.0",
+    "karma-coffee-preprocessor": "~0.1.0",
+    "karma-phantomjs-launcher": "~0.1.0",
+    "karma": "~0.10.2",
+    "grunt-karma": "~0.6.2",
+    "mocha": "~1.13.0",
+    "chai": "~1.8.1",
+    "karma-mocha": "~0.1.0"
+  }
+}
