@@ -1,4 +1,4 @@
-# Effroi.js
+![Effroi.js](http://francejs.org/effroi/images/effroi.png)
 
 An event-simulation library for JavaScript testing.
 
@@ -7,10 +7,12 @@ An event-simulation library for JavaScript testing.
 1. Clone this repo
 2. npm install
 3. To run the tests: 
-```shell
+
+```sh
 grunt test
 ```
 4. To build the lib: 
-```shell
+
+```sh
 grunt dist
 ```
