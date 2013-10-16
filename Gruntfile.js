@@ -18,8 +18,13 @@ module.exports = function(grunt) {
         },
 
         karma: {
-            lib: {
+            local: {
                 configFile: 'karma.conf.js'
+            },
+            travis: {
+                configFile: 'karma.conf.js',
+                singleRun: true,
+                browsers: ['Firefox', 'PhantomJS']
             }
         }
     });
@@ -31,6 +36,11 @@ module.exports = function(grunt) {
 
     grunt.registerTask('test', [
         'dist',
-        'karma'
+        'karma:local'
+    ]);
+
+    grunt.registerTask('travis', [
+        'dist',
+        'karma:travis'
     ]);
 };

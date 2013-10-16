@@ -9,4 +9,4 @@ before_script:
   - npm install --dev
 
 script:
-  - grunt test
+  - grunt travis
