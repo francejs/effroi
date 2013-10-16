@@ -1,14 +1,15 @@
 function Mouse() {
-    this.click = function click(selector) {
-        return this.dispatch('click', selector);
+
+		var utils = require('../utils.js');
+
+    this.click = function click(elt) {
+        return this.dispatch('click', elt);
     };
 
-    this.dispatch = function dispatch(type, selector) {
-        var elt = document.querySelector(selector),
-            event = this.supportsEventConstructors() ? this.createEvent(type, elt) : this.legacyCreateEvent(type, elt);
-        if (!elt) {
-            throw new Error("No element found for selector '" + selector + "'");
-        } 
+    this.dispatch = function dispatch(type, elt) {
+        var event = this.supportsEventConstructors() ?
+        	this.createEvent(type, elt) :
+        	this.legacyCreateEvent(type, elt);
         var canceled = !elt.dispatchEvent(event);
         return canceled;
     };
@@ -22,14 +23,10 @@ function Mouse() {
     };
 
     this.legacyCreateEvent = function legacyCreateEvent(type, elt) {
-        var evt = document.createEvent("MouseEvents"),
-            centerX = 1, centerY = 1;
-        try {
-            var pos = elt.getBoundingClientRect();
-            centerX = Math.floor((pos.left + pos.right) / 2),
-            centerY = Math.floor((pos.top + pos.bottom) / 2);
-        } catch(e) {}
-        evt.initMouseEvent(type, true, true, window, 1, 1, 1, centerX, centerY, false, false, false, false, 0, elt);
+        var evt = document.createEvent("MouseEvents");
+        utils.setEventCoords(evt, elt);
+        evt.initMouseEvent(type, true, true, window, 1, 1, 1,
+        	evt.pageX, evt.pageY, false, false, false, false, 0, elt);
         return evt;
     };
 

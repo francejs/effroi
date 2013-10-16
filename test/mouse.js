@@ -3,9 +3,9 @@ describe("Mouse device", function() {
         assert = chai.assert;
 
     describe("click", function() {
+		    var elt;
         before(function() {
-            var elt = document.createElement('div');
-            elt.id = 'clickable';
+             elt = document.createElement('div');
             elt.innerHTML = 'foo';
             document.body.appendChild(elt);
             elt.addEventListener('click', function(e) {
@@ -14,12 +14,12 @@ describe("Mouse device", function() {
         });
 
         after(function() {
-            document.body.removeChild(document.getElementById('clickable'));
+            document.body.removeChild(elt);
         });
 
         it("should trigger a click event on the element", function() {
-            mouse.click('#clickable');
-            assert(document.getElementById('clickable').className == 'clicked');
+            mouse.click(elt);
+            assert(elt.className == 'clicked');
         });
     });
 });
