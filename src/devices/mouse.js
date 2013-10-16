@@ -3,6 +3,13 @@ function Mouse() {
         return this.dispatch('click', selector);
     };
 
+    /**
+     * Dispatches a mouse event to the DOM element behind the provided selector.
+     *
+     * @param  String  type      Type of event to dispatch
+     * @param  String  selector  A CSS3 selector to the element to click
+     * @return Boolean
+     */
     this.dispatch = function dispatch(type, selector) {
         var elt = document.querySelector(selector),
             event = this.supportsEventConstructors() ? this.createEvent(type, elt) : this.legacyCreateEvent(type, elt);
