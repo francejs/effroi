@@ -8,10 +8,17 @@ function Mouse() {
         return this.dispatch('click', elt);
     };
 
-    this.dispatch = function dispatch(type, elt) {
-        var event = this.supportsEventConstructors() ?
-        	this.createEvent(type, elt) :
-        	this.legacyCreateEvent(type, elt);
+  /**
+   * Dispatches a mouse event to the DOM element behind the provided selector.
+   *
+   * @param  String  type      Type of event to dispatch
+   * @param  DOMElement  elt  A DOMElement to click
+   * @return Boolean
+   */
+  this.dispatch = function dispatch(type, elt) {
+      var event = this.supportsEventConstructors() ?
+      	this.createEvent(type, elt) :
+      	this.legacyCreateEvent(type, elt);
         var canceled = !elt.dispatchEvent(event);
         return canceled;
     };

@@ -1,5 +1,7 @@
 ![Effroi.js](http://francejs.org/effroi/images/effroi.png)
 
+[![Build Status](https://travis-ci.org/francejs/effroi.png?branch=master)](https://travis-ci.org/francejs/effroi)
+
 An event-simulation library for JavaScript testing.
 
 ## How to contribute
