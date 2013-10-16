@@ -37,7 +37,7 @@ var Tactile=(function () {
 		if(!(tactile(element, options)&&dispatched)) {
 			return false;
 		}
-		return mouse.click(element);
+		return !mouse.click(element);
 	}
 
 
