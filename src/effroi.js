@@ -1,0 +1,1 @@
+module.exports.mouse = require('./devices/mouse.js');
