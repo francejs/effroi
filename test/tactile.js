@@ -2,9 +2,9 @@ var tactile = effroi.tactile,
     assert = chai.assert;
 
 // Helper
-var elt, evts;
+var elt, evts=[], listeners=[];
 function regEventListener(elt, type, capture, stop, prevent) {
-  elt.addEventListener(type, function(e) {
+	var listener=function(e) {
 		if(e.type!=type) {
 			throw 'Event types differs.'
 		}
@@ -19,7 +19,23 @@ function regEventListener(elt, type, capture, stop, prevent) {
 		if(prevent) {
 			e.preventDefault();
 		}
-  }, capture);
+  };
+  elt.addEventListener(type, listener, capture);
+  listeners.push({
+  	elt: elt,
+  	type: type,
+  	listener : listener,
+  	capture : capture
+ 	});
+}
+
+function unreg() {
+	for(var i=listeners.length-1; i>=0; i--) {
+		listeners[i].elt.removeEventListener(
+			listeners[i].type, listeners[i].listener, listeners[i].capture);
+	}
+	evts=[];
+	elt=null;
 }
 
 // Test tactile only if it's available
@@ -39,12 +55,15 @@ if(tactile.isConnected()) {
 		          regEventListener(document.body, 'touchstart');
 		          regEventListener(document.body, 'touchend');
 		          regEventListener(document.body, 'click');
-		          evts=[];
-		          tactile.touch(elt);
 		      });
 
 		      after(function() {
 		          document.body.removeChild(elt);
+		          unreg();
+		      });
+
+		      it("normally should return true", function() {
+		         assert.equal(tactile.touch(elt),true);
 		      });
 
 		      it("should trigger a touchstart event on the element", function() {
@@ -101,12 +120,15 @@ if(tactile.isConnected()) {
 		          regEventListener(document.body, 'touchstart');
 		          regEventListener(document.body, 'touchend');
 		          regEventListener(document.body, 'click');
-		          evts=[];
-		          tactile.touch(elt);
 		      });
 
 		      after(function() {
 		          document.body.removeChild(elt);
+		          unreg();
+		      });
+
+		      it("normally should return true", function() {
+		         assert.equal(tactile.touch(elt),true);
 		      });
 
 		      it("should trigger a touchstart event on the element", function() {
@@ -137,6 +159,63 @@ if(tactile.isConnected()) {
 
 		      it("should not bubble the click event on the parent", function() {
 		    		assert.equal(evts[3], null);
+		      });
+
+		  });
+
+	});
+
+	describe("A tactile device", function() {
+
+		  describe("touching the screen while the touchend prevented", function() {
+
+		      before(function() {
+		          elt = document.createElement('div');
+		          elt.innerHTML = 'foo';
+		          document.body.appendChild(elt);
+		          regEventListener(elt, 'touchstart');
+		          regEventListener(elt, 'touchend', false, false, true);
+		          regEventListener(elt, 'click');
+		          regEventListener(document.body, 'touchstart');
+		          regEventListener(document.body, 'touchend');
+		          regEventListener(document.body, 'click');
+		      });
+
+		      after(function() {
+		          document.body.removeChild(elt);
+		          unreg();
+		      });
+
+		      it("should return false", function() {
+		         assert.equal(tactile.touch(elt),false);
+		      });
+
+		      it("should trigger a touchstart event on the element", function() {
+		    		assert.equal(evts[0].type, 'touchstart');
+		    		assert.equal(evts[0].target, elt);
+		        assert.equal(evts[0].currentTarget, elt);
+		      });
+
+		      it("should bubble the touchstart event on the parent", function() {
+		    		assert.equal(evts[1].type, 'touchstart');
+		    		assert.equal(evts[1].target, elt);
+		        assert.equal(evts[1].currentTarget, document.body);
+		      });
+
+		      it("should trigger a touchend event on the element", function() {
+		    		assert.equal(evts[2].type, 'touchend');
+		    		assert.equal(evts[2].target, elt);
+		        assert.equal(evts[2].currentTarget, elt);
+		      });
+
+		      it("should bubble the touchend event on the parent", function() {
+		    		assert.equal(evts[3].type, 'touchend');
+		    		assert.equal(evts[3].target, elt);
+		        assert.equal(evts[3].currentTarget, document.body);
+		      });
+
+		      it("should not trigger a click event on the element", function() {
+		    		assert.equal(evts[4], null);
 		      });
 
 		  });
