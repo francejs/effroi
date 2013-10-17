@@ -11,7 +11,12 @@ function regEventListener(elt, type, capture, stop, prevent) {
 		evts.push({
 			type : e.type,
 			target : e.target,
-			currentTarget : e.currentTarget
+			currentTarget : e.currentTarget,
+			altKey : e.altKey,
+			ctrlKey : e.ctrlKey,
+			shiftKey : e.shiftKey,
+			metaKey : e.metaKey,
+			button : e.button
 		});
 		if(stop) {
 			e.stopPropagation();
@@ -19,27 +24,27 @@ function regEventListener(elt, type, capture, stop, prevent) {
 		if(prevent) {
 			e.preventDefault();
 		}
-  };
-  elt.addEventListener(type, listener, capture);
-  listeners.push({
-  	elt: elt,
-  	type: type,
-  	listener : listener,
-  	capture : capture
- 	});
+	};
+	elt.addEventListener(type, listener, capture);
+	listeners.push({
+		elt: elt,
+		type: type,
+		listener : listener,
+		capture : capture
+	});
 }
 
 function init() {
-  elt = document.createElement('div');
-  elt.innerHTML = 'foo';
-  document.body.appendChild(elt);	
+	elt = document.createElement('div');
+	elt.innerHTML = 'foo';
+	document.body.appendChild(elt);
 }
 
 function uninit() {
-  document.body.removeChild(elt);
+	document.body.removeChild(elt);
 	for(var i=listeners.length-1; i>=0; i--) {
 		listeners[i].elt.removeEventListener(
-			listeners[i].type, listeners[i].listener, listeners[i].capture);
+		listeners[i].type, listeners[i].listener, listeners[i].capture);
 	}
 	evts=[];
 	elt=null;
@@ -256,6 +261,64 @@ if(tactile.isConnected()) {
 
 		      it("should not trigger a click event on the element", function() {
 		    		assert.equal(evts[4], null);
+		      });
+
+		  });
+
+
+
+		  describe("touching the screen + pushing the ctrlKey", function() {
+
+		      before(function() {
+			      	init();
+		          regEventListener(elt, 'touchstart');
+		          regEventListener(elt, 'touchend');
+		          regEventListener(elt, 'click');
+		          regEventListener(document.body, 'touchstart');
+		          regEventListener(document.body, 'touchend');
+		          regEventListener(document.body, 'click');
+		      });
+
+		      after(uninit);
+
+		      it("should return true", function() {
+		         assert.equal(tactile.touch(elt),true);
+		      });
+
+		      it("should trigger a touchstart event on the element", function() {
+		    		assert.equal(evts[0].type, 'touchstart');
+		    		assert.equal(evts[0].target, elt);
+		        assert.equal(evts[0].currentTarget, elt);
+		      });
+
+		      it("should bubble the touchstart event on the parent", function() {
+		    		assert.equal(evts[1].type, 'touchstart');
+		    		assert.equal(evts[1].target, elt);
+		        assert.equal(evts[1].currentTarget, document.body);
+		      });
+
+		      it("should trigger a touchend event on the element", function() {
+		    		assert.equal(evts[2].type, 'touchend');
+		    		assert.equal(evts[2].target, elt);
+		        assert.equal(evts[2].currentTarget, elt);
+		      });
+
+		      it("should bubble the touchend event on the parent", function() {
+		    		assert.equal(evts[3].type, 'touchend');
+		    		assert.equal(evts[3].target, elt);
+		        assert.equal(evts[3].currentTarget, document.body);
+		      });
+
+		      it("should trigger a click event on the element", function() {
+		    		assert.equal(evts[4].type, 'click');
+		    		assert.equal(evts[4].target, elt);
+		        assert.equal(evts[4].currentTarget, elt);
+		      });
+
+		      it("should bubble the click event on the parent", function() {
+		    		assert.equal(evts[5].type, 'click');
+		    		assert.equal(evts[5].target, elt);
+		        assert.equal(evts[5].currentTarget, document.body);
 		      });
 
 		  });

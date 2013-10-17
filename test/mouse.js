@@ -11,7 +11,12 @@ function regEventListener(elt, type, capture, stop, prevent) {
 		evts.push({
 			type : e.type,
 			target : e.target,
-			currentTarget : e.currentTarget
+			currentTarget : e.currentTarget,
+			altKey : e.altKey,
+			ctrlKey : e.ctrlKey,
+			shiftKey : e.shiftKey,
+			metaKey : e.metaKey,
+			button : e.button
 		});
 		if(stop) {
 			e.stopPropagation();
@@ -19,27 +24,27 @@ function regEventListener(elt, type, capture, stop, prevent) {
 		if(prevent) {
 			e.preventDefault();
 		}
-  };
-  elt.addEventListener(type, listener, capture);
-  listeners.push({
-  	elt: elt,
-  	type: type,
-  	listener : listener,
-  	capture : capture
- 	});
+	};
+	elt.addEventListener(type, listener, capture);
+	listeners.push({
+		elt: elt,
+		type: type,
+		listener : listener,
+		capture : capture
+	});
 }
 
 function init() {
-  elt = document.createElement('div');
-  elt.innerHTML = 'foo';
-  document.body.appendChild(elt);	
+	elt = document.createElement('div');
+	elt.innerHTML = 'foo';
+	document.body.appendChild(elt);
 }
 
 function uninit() {
-  document.body.removeChild(elt);
+	document.body.removeChild(elt);
 	for(var i=listeners.length-1; i>=0; i--) {
 		listeners[i].elt.removeEventListener(
-			listeners[i].type, listeners[i].listener, listeners[i].capture);
+		listeners[i].type, listeners[i].listener, listeners[i].capture);
 	}
 	evts=[];
 	elt=null;
@@ -64,6 +69,10 @@ describe("Mouse device", function() {
 
 	      it("should return true", function() {
 		    		assert.equal(mouse.click(elt), true);
+	      });
+
+	      it("should set the button property to 0", function() {
+		        assert.equal(evts[0].button, 1);
 	      });
 
 	      it("should trigger a mousedown event on the element", function() {
@@ -249,6 +258,155 @@ describe("Mouse device", function() {
 
 	      it("should not trigger a click event", function() {
 		    		assert.equal(evts[4], null);
+	      });
+
+	  });
+
+	  describe("clicking an element with altKey pushed", function() {
+
+	      before(function() {
+	      		init();
+	          regEventListener(elt, 'click');
+	          
+	      });
+
+	      after(uninit);
+
+	      it("should return true", function() {
+		    		assert.equal(mouse.click(elt, {
+		    		  altKey : true
+		    		}), true);
+	      });
+
+	      it("should set the altKey property to true", function() {
+		        assert.equal(evts[0].altKey, true);
+	      });
+
+	  });
+
+	  describe("clicking an element with ctrlKey pushed", function() {
+
+	      before(function() {
+	      		init();
+	          regEventListener(elt, 'click');
+	          
+	      });
+
+	      after(uninit);
+
+	      it("should return true", function() {
+		    		assert.equal(mouse.click(elt, {
+		    		  ctrlKey : true
+		    		}), true);
+	      });
+
+	      it("should set the ctrlKey property to true", function() {
+		        assert.equal(evts[0].ctrlKey, true);
+	      });
+
+	  });
+
+	  describe("clicking an element with shiftKey pushed", function() {
+
+	      before(function() {
+	      		init();
+	          regEventListener(elt, 'click');
+	      });
+
+	      after(uninit);
+
+	      it("should return true", function() {
+		    		assert.equal(mouse.click(elt, {
+		    		  shiftKey : true
+		    		}), true);
+	      });
+
+	      it("should set the shiftKey property to true", function() {
+		        assert.equal(evts[0].shiftKey, true);
+	      });
+
+	  });
+
+	  describe("clicking an element with metaKey pushed", function() {
+
+	      before(function() {
+	      		init();
+	          regEventListener(elt, 'click');
+	      });
+
+	      after(uninit);
+
+	      it("should return true", function() {
+		    		assert.equal(mouse.click(elt, {
+		    		  metaKey : true
+		    		}), true);
+	      });
+
+	      it("should set the ctrlKey property to true", function() {
+		        assert.equal(evts[0].metaKey, true);
+	      });
+
+	  });
+
+	  describe("clicking an element with ctrlKey pushed", function() {
+
+	      before(function() {
+	      		init();
+	          regEventListener(elt, 'click');
+	      });
+
+	      after(uninit);
+
+	      it("should return true", function() {
+		    		assert.equal(mouse.click(elt, {
+		    		  ctrlKey : true
+		    		}), true);
+	      });
+
+	      it("should set the ctrlKey property to true", function() {
+		        assert.equal(evts[0].ctrlKey, true);
+	      });
+
+	  });
+
+	  describe("clicking an element with the middle button", function() {
+
+	      before(function() {
+	      		init();
+	          regEventListener(elt, 'click');
+	      });
+
+	      after(uninit);
+
+	      it("should return true", function() {
+		    		assert.equal(mouse.click(elt, {
+		    		  button : 1
+		    		}), true);
+	      });
+
+	      it("should set the button property to 1", function() {
+		        assert.equal(evts[0].button, 1);
+	      });
+
+	  });
+
+	  describe("clicking an element with the right button", function() {
+
+	      before(function() {
+	      		init();
+	          regEventListener(elt, 'click');
+	      });
+
+	      after(uninit);
+
+	      it("should return true", function() {
+		    		assert.equal(mouse.click(elt, {
+		    		  button : 2
+		    		}), true);
+	      });
+
+	      it("should set the button property to 2", function() {
+		        assert.equal(evts[0].button, 2);
 	      });
 
 	  });

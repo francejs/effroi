@@ -11,7 +11,12 @@ function regEventListener(elt, type, capture, stop, prevent) {
 		evts.push({
 			type : e.type,
 			target : e.target,
-			currentTarget : e.currentTarget
+			currentTarget : e.currentTarget,
+			altKey : e.altKey,
+			ctrlKey : e.ctrlKey,
+			shiftKey : e.shiftKey,
+			metaKey : e.metaKey,
+			button : e.button
 		});
 		if(stop) {
 			e.stopPropagation();

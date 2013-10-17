@@ -29,7 +29,7 @@ function Mouse() {
 		options.button=options.button||1;
 		options.view=options.view||window;
 		options.altKey = !!options.altKey;
-		options.ctrlKey = !!options.ctrlKey;
+		//options.ctrlKey = !!options.ctrlKey;
 		options.shiftKey = !!options.shiftKey;
 		options.metaKey = !!options.metaKey;
 		if(document.createEvent) {
@@ -39,10 +39,11 @@ function Mouse() {
 					'bubbles': options.canBubble ? false : true,
 					'cancelable': options.cancelable ? false : true
 				});
-				event.altKey = options.altKey;
-				event.ctrlKey = options.ctrlKey;
-				event.shiftKey = options.shiftKey;
-				event.metaKey = options.metaKey;
+				utils.setEventProperty(event, 'altKey', options.altKey);
+				utils.setEventProperty(event, 'ctrlKey', options.ctrlKey);
+				utils.setEventProperty(event, 'shiftKey', options.shiftKey);
+				utils.setEventProperty(event, 'metaKey', options.metaKey);
+				utils.setEventProperty(event, 'button', options.button);
 			} catch(e) {
 				event = document.createEvent('MouseEvent');
 				event.initMouseEvent(options.type,
@@ -56,16 +57,6 @@ function Mouse() {
 					options.shiftKey, options.metaKey,
 					options.button,
 					options.relatedTarget||element);
-			}
-			// Chromium Hack
-			try {
-				Object.defineProperty(event, 'which', {
-					get : function() {
-						return options.button;
-					}
-				});
-			} catch(e) {
-				event.wich=options.button;
 			}
 			return element.dispatchEvent(event);
 		} else if(document.createEventObject) {
