@@ -34,10 +34,10 @@ var Tactile=(function () {
 		options.type='touchstart';
 		dispatched=tactile(element, options);
 		options.type='touchend';
-		if(!(tactile(element, options)&&dispatched)) {
-			return false;
+		if(tactile(element, options)&&dispatched) {
+			return mouse._click(element);
 		}
-		return !mouse.click(element);
+		return false;
 	}
 
 

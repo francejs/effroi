@@ -3,6 +3,14 @@ function Mouse() {
 		var utils = require('../utils.js');
 
     this.click = function click(elt) {
+    		var dispatched=this.dispatch('mousedown', elt);
+    		if(this.dispatch('mouseup', elt)&&dispatched) {
+        	return this.dispatch('click', elt);
+        }
+        return false;
+    };
+
+    this._click = function click(elt) {
         return this.dispatch('click', elt);
     };
 
@@ -17,8 +25,7 @@ function Mouse() {
       var event = this.supportsEventConstructors() ?
       	this.createEvent(type, elt) :
       	this.legacyCreateEvent(type, elt);
-        var canceled = !elt.dispatchEvent(event);
-        return canceled;
+        return elt.dispatchEvent(event);
     };
 
     this.createEvent = function createEvent(type, elt) {
