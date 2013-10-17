@@ -16,7 +16,8 @@ function regEventListener(elt, type, capture, stop, prevent) {
 			ctrlKey : e.ctrlKey,
 			shiftKey : e.shiftKey,
 			metaKey : e.metaKey,
-			button : e.button
+			button : e.button,
+			buttons : e.buttons
 		});
 		if(stop) {
 			e.stopPropagation();
@@ -72,7 +73,11 @@ describe("Mouse device", function() {
 	      });
 
 	      it("should set the button property to 0", function() {
-		        assert.equal(evts[0].button, 1);
+		        assert.equal(evts[0].button, 0);
+	      });
+
+	      it("should set the buttons property to LEFT_BUTTON", function() {
+		        assert.equal(evts[0].buttons, mouse.LEFT_BUTTON);
 	      });
 
 	      it("should trigger a mousedown event on the element", function() {
@@ -380,12 +385,16 @@ describe("Mouse device", function() {
 
 	      it("should return true", function() {
 		    		assert.equal(mouse.click(elt, {
-		    		  button : 1
+		    		  buttons : mouse.MIDDLE_BUTTON
 		    		}), true);
 	      });
 
 	      it("should set the button property to 1", function() {
 		        assert.equal(evts[0].button, 1);
+	      });
+
+	      it("should set the buttons property to MIDDLE_BUTTON", function() {
+		        assert.equal(evts[0].buttons, mouse.MIDDLE_BUTTON);
 	      });
 
 	  });
@@ -401,12 +410,16 @@ describe("Mouse device", function() {
 
 	      it("should return true", function() {
 		    		assert.equal(mouse.click(elt, {
-		    		  button : 2
+		    		  buttons : mouse.RIGHT_BUTTON
 		    		}), true);
 	      });
 
 	      it("should set the button property to 2", function() {
 		        assert.equal(evts[0].button, 2);
+	      });
+
+	      it("should set the buttons property to RIGHT_BUTTON", function() {
+		        assert.equal(evts[0].buttons, mouse.RIGHT_BUTTON);
 	      });
 
 	  });

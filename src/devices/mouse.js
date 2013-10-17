@@ -2,6 +2,22 @@ function Mouse() {
 
   var utils = require('../utils.js');
 
+  // Consts
+  this.LEFT_BUTTON = 1;
+  this.RIGHT_BUTTON = 2;
+  this.MIDDLE_BUTTON = 4;
+  this.BACK_BUTTON = 8;
+  this.FORWARD_BUTTON = 16;
+  this.BUTTONS_MASK = this.LEFT_BUTTON | this.RIGHT_BUTTON
+    | this.MIDDLE_BUTTON | this.BACK_BUTTON | this.FORWARD_BUTTON;
+
+  /**
+  * Perform a real mouse click on the given DOM element.
+  *
+  * @param  DOMElement  element   A DOMElement to click
+  * @param  Object      options   Clic options
+  * @return Boolean
+  */
   this.click = function click(element, options) {
 		var dispatched;
 		options=options||{};
@@ -16,20 +32,29 @@ function Mouse() {
   };
 
   /**
-  * Dispatches a mouse event to the DOM element behind the provided selector.
+  * Dispatches a mouse event to the given DOM element.
   *
-  * @param  String  type      Type of event to dispatch
-  * @param  DOMElement  elt  A DOMElement to click
+  * @param  DOMElement  element   A DOMElement on wich to dispatch the event
+  * @param  Object      options   Event options
   * @return Boolean
   */
   this.dispatch = function dispatch(element, options) {
-		var event;
+		var event, button;
 		options=options||{};
 		options.type=options.type||'click';
-		options.button=options.button||1;
+		if(options.buttons!==options.buttons&this.BUTTONS_MASK) {
+		  throw Error('Bad value for the "buttons" property.');
+		}
+		options.buttons=options.buttons||this.LEFT_BUTTON;
+		if(options.button) {
+		  throw Error('Please use the "buttons" property.');
+		}
+		button=( options.buttons&this.RIGHT_BUTTON ? 2 :
+		  ( options.buttons&this.MIDDLE_BUTTON? 1 : 0 )
+		);
 		options.view=options.view||window;
 		options.altKey = !!options.altKey;
-		//options.ctrlKey = !!options.ctrlKey;
+		options.ctrlKey = !!options.ctrlKey;
 		options.shiftKey = !!options.shiftKey;
 		options.metaKey = !!options.metaKey;
 		if(document.createEvent) {
@@ -43,7 +68,8 @@ function Mouse() {
 				utils.setEventProperty(event, 'ctrlKey', options.ctrlKey);
 				utils.setEventProperty(event, 'shiftKey', options.shiftKey);
 				utils.setEventProperty(event, 'metaKey', options.metaKey);
-				utils.setEventProperty(event, 'button', options.button);
+				utils.setEventProperty(event, 'buttons', options.buttons);
+				utils.setEventProperty(event, 'button', button);
 			} catch(e) {
 				event = document.createEvent('MouseEvent');
 				event.initMouseEvent(options.type,
@@ -55,14 +81,16 @@ function Mouse() {
 					options.clientX||0, options.clientY||0,
 					options.ctrlKey, options.altKey,
 					options.shiftKey, options.metaKey,
-					options.button,
+					button,
 					options.relatedTarget||element);
+  			utils.setEventProperty(event, 'buttons', options.buttons);
 			}
 			return element.dispatchEvent(event);
 		} else if(document.createEventObject) {
 			event = document.createEventObject();
 			event.eventType=options.type;
-			event.button=options.button;
+			event.button=button;
+			event.buttons=option.buttons;
       return element.fireEvent('on'+options.type, event);
 		}
   };
