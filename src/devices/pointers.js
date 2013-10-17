@@ -34,18 +34,19 @@ function Pointers () {
 	};
 
 	// Point an element and release
-	this.point = function (element,options) {
+	this.point = function (element, options) {
 		options=options||{};
 		options.type='MSPointerDown';
-		dispatched=this.dispatch(element,options);
+		dispatched=this.dispatch(element, options);
 		// IE10 trigger the click event even if the pointer event is cancelled
 		// should detect IE10 here and impeach dispatched to cancel click
 		// IE11+ fixed the issue.
 		options.type='MSPointerUp';
-		if(!(this.dispatch(element,options)&&dispatched)) {
-			return false;
+		if(this.dispatch(element, options)&&dispatched) {
+		  options.type='click';
+		  return mouse.dispatch(element, options);
 		}
-		return mouse.dispatch('click', element);
+		return false;
 	};
 
 }

@@ -6,7 +6,6 @@ function Tactile() {
 
 	// Detect the tactile device
 	this.isConnected = function () {
-	  return true;
 		return !!('ontouchstart' in window);
 	};
 
@@ -39,7 +38,8 @@ function Tactile() {
 		dispatched=this.dispatch(element, options);
 		options.type='touchend';
 		if(this.dispatch(element, options)&&dispatched) {
-			return mouse._click(element);
+		  options.type='click';
+		  return mouse.dispatch(element, options);
 		}
 		return false;
 	};
