@@ -1,16 +1,16 @@
-var Pointers=(function () {
+function Pointers () {
 
 	// Neeed mouse to perform click
 	var mouse = require('./mouse.js');
 	var utils = require('../utils.js');
 
 	// Pointer interactions
-	function isConnected() {
+	this.isConnected = function () {
 		return window.navigator.msPointerEnabled ? true : false;
-	}
+	};
 
 	// Trigger pointer events
-	function pointer(element,options) {
+	this.dispatch = function(element,options) {
 		options=options||{};
 		var event = document.createEvent('MSPointerEvent');
 	  utils.setEventCoords(event, element);
@@ -31,29 +31,23 @@ var Pointers=(function () {
 			options.pointerId||1, options.pointerType||'mouse',
 			options.hwTimestamp||Date.now(), options.isPrimary||true);
 		return element.dispatchEvent(event);
-	}
+	};
 
 	// Point an element and release
-	function point(element,options) {
+	this.point = function (element,options) {
 		options=options||{};
 		options.type='MSPointerDown';
-		dispatched=pointer(element,options);
+		dispatched=this.dispatch(element,options);
 		// IE10 trigger the click event even if the pointer event is cancelled
 		// should detect IE10 here and impeach dispatched to cancel click
 		// IE11+ fixed the issue.
 		options.type='MSPointerUp';
-		if(!(pointer(element,options)&&dispatched)) {
+		if(!(this.dispatch(element,options)&&dispatched)) {
 			return false;
 		}
-		return mouse._click(element);
-	}
-
-	return {
-		isConnected : isConnected,
-		pointer : pointer,
-		point : point
+		return mouse.dispatch('click', element);
 	};
 
-})();
+}
 
-module.exports = Pointers;
+module.exports = new Pointers();
