@@ -12,6 +12,8 @@ function regEventListener(elt, type, capture, stop, prevent) {
 			type : e.type,
 			target : e.target,
 			currentTarget : e.currentTarget,
+			clientX : e.clientX,
+			clientY : e.clientY,
 			altKey : e.altKey,
 			ctrlKey : e.ctrlKey,
 			shiftKey : e.shiftKey,
@@ -75,6 +77,15 @@ describe("Mouse device", function() {
 	      it("should set the button property to 0", function() {
 		        assert.equal(evts[0].button, 0);
 	      });
+
+        if(document.elementFromPoint&&document.body.getBoundingClientRect) {
+	        it("should return right coords", function() {
+    	      assert.equal(
+    	        document.elementFromPoint(evts[0].clientX, evts[0].clientY),
+    	        elt
+    	      );
+	        });
+	      }
 
 	      it("should set the buttons property to LEFT_BUTTON", function() {
 		        assert.equal(evts[0].buttons, mouse.LEFT_BUTTON);

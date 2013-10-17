@@ -70,15 +70,18 @@ function Mouse() {
 				utils.setEventProperty(event, 'metaKey', options.metaKey);
 				utils.setEventProperty(event, 'buttons', options.buttons);
 				utils.setEventProperty(event, 'button', button);
+   			utils.setEventCoords(event, element);
 			} catch(e) {
 				event = document.createEvent('MouseEvent');
+			  var fakeEvent = {};
+   			utils.setEventCoords(fakeEvent, element);
 				event.initMouseEvent(options.type,
 					'false' === options.canBubble ? false : true,
 					'false' === options.cancelable ? false : true,
 					options.view,
 					options.detail||1,
-					options.screenX||0, options.screenY||0,
-					options.clientX||0, options.clientY||0,
+					fakeEvent.screenX||0, fakeEvent.screenY||0,
+					fakeEvent.clientX||0, fakeEvent.clientY||0,
 					options.ctrlKey, options.altKey,
 					options.shiftKey, options.metaKey,
 					button,

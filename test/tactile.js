@@ -12,6 +12,8 @@ function regEventListener(elt, type, capture, stop, prevent) {
 			type : e.type,
 			target : e.target,
 			currentTarget : e.currentTarget,
+			clientX : e.clientX,
+			clientY : e.clientY,
 			altKey : e.altKey,
 			ctrlKey : e.ctrlKey,
 			shiftKey : e.shiftKey,

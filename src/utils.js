@@ -1,14 +1,18 @@
 module.exports={
 	setEventCoords: function(event, element) {
-	  // FIXME : should calculate pageX/Y, clientX/Y, screenX/Y and use setEventProperty
+	  var x, y;
 		try {
 			var rect = elt.getBoundingClientRect();
-      event.pageX = Math.floor((rect.left + rect.right) / 2);
-      event.pageY = Math.floor((rect.top + rect.bottom) / 2);
+      x = Math.floor((rect.left + rect.right) / 2);
+      y = Math.floor((rect.top + rect.bottom) / 2);
     } catch(e) {
-      event.pageX = 1;
-      event.pageY = 1;
+      x = 1;
+      y = 1;
     }
+    this.setEventProperty(event, 'clientX', x);
+    this.setEventProperty(event, 'clientY', y);
+    this.setEventProperty(event, 'pageX', x+window.scrollX);
+    this.setEventProperty(event, 'pageY', y+window.scrollY);
 	},
 	setEventProperty: function(event, property, value) {
 		try {
