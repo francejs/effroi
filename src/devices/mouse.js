@@ -75,6 +75,7 @@ function Mouse() {
 		options.ctrlKey = !!options.ctrlKey;
 		options.shiftKey = !!options.shiftKey;
 		options.metaKey = !!options.metaKey;
+		options.relatedTarget = options.relatedTarget||null;
 		if(document.createEvent) {
 			try {
 				event = new MouseEvent(options.type, {
@@ -88,6 +89,7 @@ function Mouse() {
 				utils.setEventProperty(event, 'metaKey', options.metaKey);
 				utils.setEventProperty(event, 'buttons', options.buttons);
 				utils.setEventProperty(event, 'button', button);
+				utils.setEventProperty(event, 'relatedTarget', options.relatedTarget);
    			utils.setEventCoords(event, element);
 			} catch(e) {
 				event = document.createEvent('MouseEvent');
@@ -98,12 +100,12 @@ function Mouse() {
 					'false' === options.cancelable ? false : true,
 					options.view,
 					options.detail||1,
-					fakeEvent.screenX||0, fakeEvent.screenY||0,
-					fakeEvent.clientX||0, fakeEvent.clientY||0,
+					fakeEvent.screenX, fakeEvent.screenY,
+					fakeEvent.clientX, fakeEvent.clientY,
 					options.ctrlKey, options.altKey,
 					options.shiftKey, options.metaKey,
 					button,
-					options.relatedTarget||element);
+					options.relatedTarget);
   			utils.setEventProperty(event, 'buttons', options.buttons);
 			}
 			return element.dispatchEvent(event);

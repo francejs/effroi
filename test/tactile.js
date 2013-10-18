@@ -19,7 +19,9 @@ function regEventListener(elt, type, capture, stop, prevent) {
 			shiftKey : e.shiftKey,
 			metaKey : e.metaKey,
 			button : e.button,
-			buttons : e.buttons
+			buttons : e.buttons,
+			view : e.view,
+			relatedTarget : e.relatedTarget
 		});
 		if(stop) {
 			e.stopPropagation();
