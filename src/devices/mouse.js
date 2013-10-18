@@ -78,7 +78,6 @@ function Mouse() {
 		});
 		element.focus();
 		if(!focusEventFired) {
-		  element.removeEventListener('focus', focusListener);
 		  options.type='focus';
 		  dispatched = this.dispatch(element, options);
 		}
