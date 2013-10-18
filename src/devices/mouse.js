@@ -15,7 +15,7 @@ function Mouse() {
   var _x=1, _y=1;
 
   /**
-  * Perform a real mouse bouble click on the given DOM element.
+  * Perform a real mouse double click on the given DOM element.
   *
   * @param  DOMElement  element   A DOMElement to dblclick
   * @param  Object      options   Clic options
@@ -23,6 +23,7 @@ function Mouse() {
   */
   this.dblclick = function click(element, options) {
 		var dispatched;
+		this.moveTo(element);
 		options=options||{};
 		dispatched=this.click(element, options);
 		if(!(this.click(element, options)&&dispatched)) {
@@ -41,6 +42,7 @@ function Mouse() {
   */
   this.click = function click(element, options) {
 		var dispatched;
+		this.moveTo(element);
 		options=options||{};
 		options.type='mousedown';
 		dispatched=this.dispatch(element, options);
@@ -53,6 +55,36 @@ function Mouse() {
   };
 
   /**
+  * Focus a DOM element with the mouse.
+  *
+  * @param  DOMElement  element   A DOMElement to focus
+  * @param  Object      options   Event options
+  * @return Boolean
+  */
+  this.focus = function focus(element, options) {
+		var dispatched, focusEventFired=false;
+		this.moveTo(element);
+		options=options||{};
+		options.type='mousedown';
+		dispatched=this.dispatch(element, options);
+		// Here, maybe find the first parent element having greater bound rect
+		// and move on it's focusable zone or fail if none available
+		this.moveTo(element.parentNode);
+		options.type='mouseup';
+		this.dispatch(element.parentNode, options);
+		element.addEventListener('focus',function() {
+		  focusEventFired=true;
+		  element.removeEventListener('focus',this.callee);
+		});
+		element.focus();
+		if(!focusEventFired) {
+		  options.type='focus';
+		  dispatched = this.dispatch(element, options);
+		}
+		return dispatched;
+  };
+
+  /**
   * Perform a real mouse move to the given coordinates.
   *
   * @param  int      x         The x position to go
@@ -60,9 +92,10 @@ function Mouse() {
   * @param  Object   options   Clic options
   * @return Boolean
   */
-  this.moveTo = function moveTo(x, y, options) {
+  this.move = function move(x, y, options) {
     var curElement=document.elementFromPoint(_x, _y),
       targetElement=document.elementFromPoint(x, y);
+    this.scroll(x, y, options);
     if(!targetElement) {
       throw Error('Couldn\'t perform the move. Coordinnates seems invalid.')
     }
@@ -89,9 +122,9 @@ function Mouse() {
   * @param  Object      options   Clic options
   * @return Boolean
   */
-  this.move = function move(element, options) {
+  this.moveTo = function moveTo(element, options) {
     var c = utils.getElementCenter(element);
-		return this.moveTo(c.x, c.y, options);
+		return this.move(c.x, c.y, options);
   };
 
   /**

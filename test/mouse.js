@@ -534,8 +534,8 @@ describe("Mouse device", function() {
 	      after(uninit);
 
 	      it("should return true", function() {
-		    		assert.equal(mouse.move(elt.firstChild.firstChild), true);
-		    		assert.equal(mouse.move(elt.lastChild.firstChild), true);
+		    		assert.equal(mouse.moveTo(elt.firstChild.firstChild), true);
+		    		assert.equal(mouse.moveTo(elt.lastChild.firstChild), true);
 	      });
 
 	      it("should trigger a mouseout event on old under cursor element", function() {
@@ -598,6 +598,45 @@ describe("Mouse device", function() {
           }
 
 	      });
+
+	  });
+
+	  describe("focusing an element", function() {
+
+	      before(function() {
+	      		init('<p>Text</p><p><a href="#">A link</a></p>');
+	          regEventListener(elt.lastChild.firstChild, 'mouseover');
+	          regEventListener(elt.lastChild.firstChild, 'mouseout');
+	          regEventListener(elt.lastChild.firstChild, 'focus');
+	      });
+
+	      after(uninit);
+
+        it("should return true", function() {
+	        assert.equal(mouse.focus(elt.lastChild.firstChild), true);
+        });
+
+        it("should set the link as the active element", function() {
+	        assert.equal(elt.lastChild.firstChild, document.activeElement);
+        });
+
+        it("should trigger a mouseover event on the focused element", function() {
+	        assert.equal(evts[0].type, 'mouseover');
+	        assert.equal(evts[0].target, elt.lastChild.firstChild);
+          assert.equal(evts[0].currentTarget, elt.lastChild.firstChild);
+        });
+
+        it("should trigger a mouseout event on the focused element", function() {
+	        assert.equal(evts[1].type, 'mouseout');
+	        assert.equal(evts[1].target, elt.lastChild.firstChild);
+          assert.equal(evts[1].currentTarget, elt.lastChild.firstChild);
+        });
+
+        it("should trigger a focus event on the focused element", function() {
+	        assert.equal(evts[2].type, 'focus');
+	        assert.equal(evts[2].target, elt.lastChild.firstChild);
+          assert.equal(evts[2].currentTarget, elt.lastChild.firstChild);
+        });
 
 	  });
 
