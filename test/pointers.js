@@ -1,5 +1,5 @@
 var pointers = effroi.pointers,
-	assert = chai.assert;
+    assert = chai.assert;
 
 // Helper
 var elt, evts=[], listeners=[];

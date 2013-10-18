@@ -12,6 +12,24 @@ function Mouse() {
     | this.MIDDLE_BUTTON | this.BACK_BUTTON | this.FORWARD_BUTTON;
 
   /**
+  * Perform a real mouse bouble click on the given DOM element.
+  *
+  * @param  DOMElement  element   A DOMElement to dblclick
+  * @param  Object      options   Clic options
+  * @return Boolean
+  */
+  this.dblclick = function click(element, options) {
+		var dispatched;
+		options=options||{};
+		dispatched=this.click(element, options);
+		if(!(this.click(element, options)&&dispatched)) {
+			return false;
+		}
+		options.type='dblclick';
+		return this.dispatch(element, options);
+  };
+
+  /**
   * Perform a real mouse click on the given DOM element.
   *
   * @param  DOMElement  element   A DOMElement to click

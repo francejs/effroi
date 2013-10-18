@@ -139,7 +139,6 @@ describe("Mouse device", function() {
 	          regEventListener(document.body, 'mousedown');
 	          regEventListener(document.body, 'mouseup');
 	          regEventListener(document.body, 'click');
-	          
 	      });
 
 	      after(uninit);
@@ -431,6 +430,83 @@ describe("Mouse device", function() {
 
 	      it("should set the buttons property to RIGHT_BUTTON", function() {
 		        assert.equal(evts[0].buttons, mouse.RIGHT_BUTTON);
+	      });
+
+	  });
+
+	  describe("double clicking an element with the right button", function() {
+
+	      before(function() {
+	      		init();
+	          regEventListener(elt, 'click');
+	          regEventListener(elt, 'mousedown');
+	          regEventListener(elt, 'mouseup');
+	          regEventListener(elt, 'dblclick');
+	          regEventListener(document.body, 'dblclick');
+	      });
+
+	      after(uninit);
+
+	      it("should return true", function() {
+		    		assert.equal(mouse.dblclick(elt, {
+		    		  buttons : mouse.RIGHT_BUTTON
+		    		}), true);
+	      });
+
+	      it("should set the button property to 2", function() {
+		        assert.equal(evts[0].button, 2);
+	      });
+
+	      it("should set the buttons property to RIGHT_BUTTON", function() {
+		        assert.equal(evts[0].buttons, mouse.RIGHT_BUTTON);
+	      });
+
+	      it("should trigger a mousedown event on the element", function() {
+		    		assert.equal(evts[0].type, 'mousedown');
+		    		assert.equal(evts[0].target, elt);
+		        assert.equal(evts[0].currentTarget, elt);
+	      });
+
+	      it("should trigger a mouseup event on the element", function() {
+		    		assert.equal(evts[1].type, 'mouseup');
+		    		assert.equal(evts[1].target, elt);
+		        assert.equal(evts[1].currentTarget, elt);
+	      });
+
+	      it("should trigger a click event on the element", function() {
+		    		assert.equal(evts[2].type, 'click');
+		    		assert.equal(evts[2].target, elt);
+		        assert.equal(evts[2].currentTarget, elt);
+	      });
+
+	      it("should trigger a mousedown event on the element", function() {
+		    		assert.equal(evts[3].type, 'mousedown');
+		    		assert.equal(evts[3].target, elt);
+		        assert.equal(evts[3].currentTarget, elt);
+	      });
+
+	      it("should trigger a mouseup event on the element", function() {
+		    		assert.equal(evts[4].type, 'mouseup');
+		    		assert.equal(evts[4].target, elt);
+		        assert.equal(evts[4].currentTarget, elt);
+	      });
+
+	      it("should trigger a click event on the element", function() {
+		    		assert.equal(evts[5].type, 'click');
+		    		assert.equal(evts[5].target, elt);
+		        assert.equal(evts[5].currentTarget, elt);
+	      });
+
+	      it("should trigger a dblclick event on the element", function() {
+		    		assert.equal(evts[6].type, 'dblclick');
+		    		assert.equal(evts[6].target, elt);
+		        assert.equal(evts[6].currentTarget, elt);
+	      });
+
+	      it("should bubble the dblclick event on the parent", function() {
+		    		assert.equal(evts[7].type, 'dblclick');
+		    		assert.equal(evts[7].target, elt);
+		        assert.equal(evts[7].currentTarget, document.body);
 	      });
 
 	  });
