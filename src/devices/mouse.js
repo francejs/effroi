@@ -72,12 +72,13 @@ function Mouse() {
 		this.moveTo(element.parentNode);
 		options.type='mouseup';
 		this.dispatch(element.parentNode, options);
-		element.addEventListener('focus',function() {
+		element.addEventListener('focus', function focusListener() {
 		  focusEventFired=true;
-		  element.removeEventListener('focus',this.callee);
+		  element.removeEventListener('focus', focusListener);
 		});
 		element.focus();
 		if(!focusEventFired) {
+		  element.removeEventListener('focus', focusListener);
 		  options.type='focus';
 		  dispatched = this.dispatch(element, options);
 		}
