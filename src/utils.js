@@ -31,15 +31,6 @@ module.exports={
 			} catch(e) {
 				event[property]=value;
 			}
-	},
-
-  supportsEventConstructors : ((function () {
-    try {
-      return new Event('submit', { bubbles: false }).bubbles === false
-        && new Event('submit', { bubbles: true }).bubbles === true;
-    } catch (e) {
-      return false;
-    }
-  })())
+	}
 
 };

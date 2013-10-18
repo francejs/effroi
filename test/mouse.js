@@ -560,4 +560,45 @@ describe("Mouse device", function() {
 
 	  });
 
+	  describe("scrolling to an element", function() {
+
+        var type=('onwheel' in document ? 'wheel' :
+          ('onmousewheel' in document ? 'mousewheel' : '')
+         );
+
+        if(!type) {
+          return;
+        }
+
+	      before(function() {
+	      		init('<p style="height:10000px; width:1000px; background:#F00;">Block 1</p>'
+	      		  +'<p style="height:10000px; width:1000px; background:#0F0;">Block 2</p>'
+	      		  +'<p style="height:10000px; width:1000px; background:#00F;">Block 3</p>');
+	          regEventListener(elt.firstChild, type);
+	          regEventListener(elt.lastChild, type);
+	      });
+
+	      after(uninit);
+
+	      it("should return true if scrolled, false otherwise", function() {
+
+          var dispatched = mouse.scrollTo(elt.lastChild);
+
+          if(25048>window.innerHeight) {
+		      		assert.equal(dispatched, true);
+
+	            it("should trigger a wheel event on the first element", function() {
+		          		assert.equal(evts[0].type, type);
+		          		assert.equal(evts[0].target, elt.firstChild);
+		              assert.equal(evts[0].currentTarget, elt.firstChild);
+	            });
+
+          } else {
+              assert.equal(dispatched, false);
+          }
+
+	      });
+
+	  });
+
 });

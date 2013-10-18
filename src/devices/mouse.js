@@ -89,9 +89,69 @@ function Mouse() {
   * @param  Object      options   Clic options
   * @return Boolean
   */
-  this.move = function moveTo(element, options) {
+  this.move = function move(element, options) {
     var c = utils.getElementCenter(element);
 		return this.moveTo(c.x, c.y, options);
+  };
+
+  /**
+  * Perform a scroll with the mouse wheel.
+  *
+  * @param  int         x         The x delta to scroll to
+  * @param  int         y         The y delta to scroll to
+  * @param  Object      options   Clic options
+  * @return Boolean
+  */
+  this.scroll = function scroll(x, y, options) {
+    var dispatched=true, scrollX = 0, scrollY = 0;
+    options = options || {};
+    options.type = ('onwheel' in document ? 'wheel' :
+      ('onmousewheel' in document ? 'mousewheel' : '')
+    );
+    if(options.type) {
+      // Moving through the x axis
+      options.shiftKey = true;
+      options.wheelDelta = 120;
+      options.wheelDeltaX = (x < 0 ? 120 : -120);
+      options.wheelDeltaY = 0;
+      while(dispatched && (x+scrollX<0  || x+scrollX > window.innerWidth)) {
+        console.log(scrollX, dispatched, _x, _y, window.scrollX);
+    		dispatched=this.dispatch(document.elementFromPoint(_x, _y), options);
+        if(dispatched) {
+          scrollX +=  options.wheelDeltaX;
+      		window.scrollTo(window.scrollX - options.wheelDeltaX, window.scrollY);
+      	}
+    	}
+      // Then moving through the y axis
+      options.wheelDelta = 120;
+      options.wheelDeltaX = 0;
+      options.wheelDeltaY = (y < 0 ? 120 : -120);
+      while(dispatched && (y+scrollY<0  || y+scrollY > window.innerHeight)) {
+    		dispatched=this.dispatch(document.elementFromPoint(_x, _y), options);
+        if(dispatched) {
+          scrollY +=  options.wheelDeltaY;
+      		window.scrollTo(window.scrollX, window.scrollY - options.wheelDeltaY);
+      	}
+    	}
+    }
+  	return dispatched;
+  };
+
+  /**
+  * Perform a scroll with the mouse wheel.
+  *
+  * @param  DOMElement  element   A DOMElement on wich to scroll to
+  * @param  Object      options   Clic options
+  * @return Boolean
+  */
+  this.scrollTo = function scrollTo(element, options) {
+    // Getting element center
+    var c = utils.getElementCenter(element);
+    // Scroll only if the element is not already in the viewport
+    if(c.x<0 || c.y<0 || c.x > window.innerWidth || c.y > window.innerHeight) {
+    	return this.scroll(c.x, c.y, options);
+    }
+    return false;
   };
 
   /**
