@@ -11,6 +11,9 @@ function Mouse() {
   this.BUTTONS_MASK = this.LEFT_BUTTON | this.RIGHT_BUTTON
     | this.MIDDLE_BUTTON | this.BACK_BUTTON | this.FORWARD_BUTTON;
 
+  // Private vars
+  var _x=1, _y=1;
+
   /**
   * Perform a real mouse bouble click on the given DOM element.
   *
@@ -47,6 +50,48 @@ function Mouse() {
 		}
 		options.type='click';
 		return this.dispatch(element, options);
+  };
+
+  /**
+  * Perform a real mouse move to the given coordinates.
+  *
+  * @param  int      x         The x position to go
+  * @param  int      y         The y position to go
+  * @param  Object   options   Clic options
+  * @return Boolean
+  */
+  this.moveTo = function moveTo(x, y, options) {
+    var curElement=document.elementFromPoint(_x, _y),
+      targetElement=document.elementFromPoint(x, y);
+    if(!targetElement) {
+      throw Error('Couldn\'t perform the move. Coordinnates seems invalid.')
+    }
+    if(curElement===targetElement) {
+      return false;
+    }
+    // Could move the cursor of %n px and repeat mouseover/out events
+    // killer feature or overkill ?
+		options=options||{};
+		options.type='mouseout';
+		options.relatedTarget=targetElement;
+		dispatched=this.dispatch(curElement, options);
+		options.type='mouseover';
+		options.relatedTarget=curElement;
+		dispatched=this.dispatch(targetElement, options);
+		_x=x; _y=y;
+		return true;
+  };
+
+  /**
+  * Perform a real mouse move to an element.
+  *
+  * @param  DOMElement  element   A DOMElement on wich to move the cursor
+  * @param  Object      options   Clic options
+  * @return Boolean
+  */
+  this.move = function moveTo(element, options) {
+    var c = utils.getElementCenter(element);
+		return this.moveTo(c.x, c.y, options);
   };
 
   /**
@@ -106,6 +151,7 @@ function Mouse() {
 					options.shiftKey, options.metaKey,
 					button,
 					options.relatedTarget);
+   			utils.setEventCoords(event, element);
   			utils.setEventProperty(event, 'buttons', options.buttons);
 			}
 			return element.dispatchEvent(event);

@@ -39,9 +39,9 @@ function regEventListener(elt, type, capture, stop, prevent) {
 	});
 }
 
-function init() {
+function init(innerHTML) {
 	elt = document.createElement('div');
-	elt.innerHTML = 'foo';
+	elt.innerHTML = innerHTML || 'foo';
 	document.body.appendChild(elt);
 }
 

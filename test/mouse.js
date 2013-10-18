@@ -39,9 +39,9 @@ function regEventListener(elt, type, capture, stop, prevent) {
 	});
 }
 
-function init() {
+function init(innerHTML) {
 	elt = document.createElement('div');
-	elt.innerHTML = 'foo';
+	elt.innerHTML = innerHTML || 'foo';
 	document.body.appendChild(elt);
 }
 
@@ -517,6 +517,45 @@ describe("Mouse device", function() {
 		    		assert.equal(evts[7].type, 'dblclick');
 		    		assert.equal(evts[7].target, elt);
 		        assert.equal(evts[7].currentTarget, document.body);
+	      });
+
+	  });
+
+	  describe("moving to an element", function() {
+
+	      before(function() {
+	      		init('<p><span>Line 1</span></p><p><span>Line 2</span></p>'
+	      		  +'<p><span>Line 3</span></p><p><span>Line 4</span></p>');
+	          regEventListener(elt.firstChild.firstChild, 'mouseout');
+	          regEventListener(elt.lastChild.firstChild, 'mouseover');
+	          regEventListener(elt.lastChild.firstChild, 'mouseout');
+	      });
+
+	      after(uninit);
+
+	      it("should return true", function() {
+		    		assert.equal(mouse.move(elt.firstChild.firstChild), true);
+		    		assert.equal(mouse.move(elt.lastChild.firstChild), true);
+	      });
+
+	      it("should trigger a mouseout event on old under cursor element", function() {
+		    		assert.equal(evts[0].type, 'mouseout');
+		    		assert.equal(evts[0].target, elt.firstChild.firstChild);
+		        assert.equal(evts[0].currentTarget, elt.firstChild.firstChild);
+	      });
+
+	      it("should set the newly under cursor element", function() {
+		        assert.equal(evts[0].relatedTarget, elt.lastChild.firstChild);
+	      });
+
+	      it("should trigger a mouseover event on newly under cursor element", function() {
+		    		assert.equal(evts[1].type, 'mouseover');
+		    		assert.equal(evts[1].target, elt.lastChild.firstChild);
+		        assert.equal(evts[1].currentTarget, elt.lastChild.firstChild);
+	      });
+
+	      it("should set the newly  under cursor element", function() {
+		        assert.equal(evts[1].relatedTarget, elt.firstChild.firstChild);
 	      });
 
 	  });
