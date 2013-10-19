@@ -12,7 +12,7 @@ function Mouse() {
     | this.MIDDLE_BUTTON | this.BACK_BUTTON | this.FORWARD_BUTTON;
 
   // Private vars
-  var _x=1, _y=1;
+  var _x = 1, _y = 1;
 
   /**
   * Perform a real mouse double click on the given DOM element.
@@ -24,12 +24,12 @@ function Mouse() {
   this.dblclick = function click(element, options) {
     var dispatched;
     this.moveTo(element);
-    options=options||{};
-    dispatched=this.click(element, options);
+    options = options||{};
+    dispatched = this.click(element, options);
     if(!(this.click(element, options)&&dispatched)) {
       return false;
     }
-    options.type='dblclick';
+    options.type = 'dblclick';
     return this.dispatch(element, options);
   };
 
@@ -43,14 +43,14 @@ function Mouse() {
   this.click = function click(element, options) {
     var dispatched;
     this.moveTo(element);
-    options=options||{};
-    options.type='mousedown';
-    dispatched=this.dispatch(element, options);
-    options.type='mouseup';
+    options = options||{};
+    options.type = 'mousedown';
+    dispatched = this.dispatch(element, options);
+    options.type = 'mouseup';
     if(!(this.dispatch(element, options)&&dispatched)) {
       return false;
     }
-    options.type='click';
+    options.type = 'click';
     return this.dispatch(element, options);
   };
 
@@ -64,21 +64,21 @@ function Mouse() {
   this.focus = function focus(element, options) {
     var dispatched, focusEventFired=false;
     this.moveTo(element);
-    options=options||{};
-    options.type='mousedown';
+    options = options||{};
+    options.type = 'mousedown';
     dispatched=this.dispatch(element, options);
     // Here, maybe find the first parent element having greater bound rect
     // and move on it's focusable zone or fail if none available
     this.moveTo(element.parentNode);
-    options.type='mouseup';
+    options.type = 'mouseup';
     this.dispatch(element.parentNode, options);
     element.addEventListener('focus', function focusListener() {
-      focusEventFired=true;
+      focusEventFired = true;
       element.removeEventListener('focus', focusListener);
     });
     element.focus();
     if(!focusEventFired) {
-      options.type='focus';
+      options.type = 'focus';
       dispatched = this.dispatch(element, options);
     }
     return dispatched;
@@ -93,8 +93,8 @@ function Mouse() {
   * @return Boolean
   */
   this.move = function move(x, y, options) {
-    var curElement=document.elementFromPoint(_x, _y),
-      targetElement=document.elementFromPoint(x, y);
+    var curElement = document.elementFromPoint(_x, _y),
+      targetElement = document.elementFromPoint(x, y);
     this.scroll(x, y, options);
     if(!targetElement) {
       throw Error('Couldn\'t perform the move. Coordinnates seems invalid.')
@@ -104,14 +104,14 @@ function Mouse() {
     }
     // Could move the cursor of %n px and repeat mouseover/out events
     // killer feature or overkill ?
-    options=options||{};
-    options.type='mouseout';
-    options.relatedTarget=targetElement;
-    dispatched=this.dispatch(curElement, options);
-    options.type='mouseover';
-    options.relatedTarget=curElement;
-    dispatched=this.dispatch(targetElement, options);
-    _x=x; _y=y;
+    options = options || {};
+    options.type = 'mouseout';
+    options.relatedTarget = targetElement;
+    dispatched = this.dispatch(curElement, options);
+    options.type = 'mouseover';
+    options.relatedTarget = curElement;
+    dispatched = this.dispatch(targetElement, options);
+    _x = x; _y = y;
     return true;
   };
 
@@ -196,19 +196,22 @@ function Mouse() {
   */
   this.dispatch = function dispatch(element, options) {
     var event, button;
-    options=options||{};
-    options.type=options.type||'click';
-    if(options.buttons!==options.buttons&this.BUTTONS_MASK) {
+    options = options || {};
+    options.type = options.type || 'click';
+    if(options.buttons !== options.buttons&this.BUTTONS_MASK) {
       throw Error('Bad value for the "buttons" property.');
     }
-    options.buttons=options.buttons||this.LEFT_BUTTON;
+    options.buttons = options.buttons || this.LEFT_BUTTON;
     if(options.button) {
       throw Error('Please use the "buttons" property.');
     }
     button=( options.buttons&this.RIGHT_BUTTON ? 2 :
       ( options.buttons&this.MIDDLE_BUTTON? 1 : 0 )
     );
-    options.view=options.view||window;
+    options.canBubble = ('false' === options.canBubble ? false : true);
+    options.cancelable = ('false' === options.cancelable ? false : true);
+    options.view = options.view || window;
+    options.detail = options.detail || 1,
     options.altKey = !!options.altKey;
     options.ctrlKey = !!options.ctrlKey;
     options.shiftKey = !!options.shiftKey;
@@ -217,9 +220,9 @@ function Mouse() {
     if(document.createEvent) {
       try {
         event = new MouseEvent(options.type, {
-          'view': window,
-          'bubbles': options.canBubble ? false : true,
-          'cancelable': options.cancelable ? false : true
+          'view': options.view,
+          'bubbles': options.canBubble,
+          'cancelable': options.cancelable
         });
         utils.setEventProperty(event, 'altKey', options.altKey);
         utils.setEventProperty(event, 'ctrlKey', options.ctrlKey);
@@ -228,31 +231,28 @@ function Mouse() {
         utils.setEventProperty(event, 'buttons', options.buttons);
         utils.setEventProperty(event, 'button', button);
         utils.setEventProperty(event, 'relatedTarget', options.relatedTarget);
-         utils.setEventCoords(event, element);
+        utils.setEventCoords(event, element);
       } catch(e) {
         event = document.createEvent('MouseEvent');
         var fakeEvent = {};
          utils.setEventCoords(fakeEvent, element);
         event.initMouseEvent(options.type,
-          'false' === options.canBubble ? false : true,
-          'false' === options.cancelable ? false : true,
-          options.view,
-          options.detail||1,
+          options.canBubble, options.cancelable,
+          options.view, options.detail,
           fakeEvent.screenX, fakeEvent.screenY,
           fakeEvent.clientX, fakeEvent.clientY,
           options.ctrlKey, options.altKey,
           options.shiftKey, options.metaKey,
-          button,
-          options.relatedTarget);
+          button, options.relatedTarget);
          utils.setEventCoords(event, element);
         utils.setEventProperty(event, 'buttons', options.buttons);
       }
       return element.dispatchEvent(event);
     } else if(document.createEventObject) {
       event = document.createEventObject();
-      event.eventType=options.type;
-      event.button=button;
-      event.buttons=option.buttons;
+      event.eventType = options.type;
+      event.button = button;
+      event.buttons = option.buttons;
       return element.fireEvent('on'+options.type, event);
     }
   };
