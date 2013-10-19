@@ -148,7 +148,6 @@ function Mouse() {
       options.wheelDeltaX = (x < 0 ? 120 : -120);
       options.wheelDeltaY = 0;
       while(dispatched && (x+scrollX<0  || x+scrollX > window.innerWidth)) {
-        console.log(scrollX, dispatched, _x, _y, window.scrollX);
         dispatched=this.dispatch(document.elementFromPoint(_x, _y), options);
         if(dispatched) {
           scrollX +=  options.wheelDeltaX;

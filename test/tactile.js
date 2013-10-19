@@ -86,6 +86,15 @@ if(tactile.isConnected()) {
              assert.equal(tactile.touch(elt),true);
           });
 
+          if(document.elementFromPoint&&document.body.getBoundingClientRect) {
+            it("should return right coords", function() {
+              assert.equal(
+                document.elementFromPoint(evts[0].clientX, evts[0].clientY),
+                elt
+              );
+            });
+          }
+
           it("should trigger a touchstart event on the element", function() {
             assert.equal(evts[0].type, 'touchstart');
             assert.equal(evts[0].target, elt);
@@ -327,6 +336,40 @@ if(tactile.isConnected()) {
           });
 
       });
+
+    describe("scrolling to an element", function() {
+
+        before(function() {
+            init('<p style="height:10000px; width:1000px; background:#F00;">Block 1</p>'
+              +'<p style="height:10000px; width:1000px; background:#0F0;">Block 2</p>'
+              +'<p style="height:10000px; width:1000px; background:#00F;">Block 3</p>');
+            regEventListener(elt, 'touchstart');
+            regEventListener(elt, 'touchmove');
+            regEventListener(elt, 'touchend');
+        });
+
+        after(uninit);
+
+        it("should return true if scrolled, false otherwise", function() {
+            assert.equal(tactile.scrollTo(elt),
+              (25048>window.innerHeight ? true : false));
+        });
+
+        it("should trigger a touchstart event", function() {
+            if((25048>window.innerHeight)) {
+              assert.equal(evts[0].type, 'touchstart');
+            } else {
+              assert.equal(evts[0], null);
+            }
+        });
+
+        it("should trigger a touchend event", function() {
+            if((25048>window.innerHeight)) {
+              assert.equal(evts[0].type, 'touchstart');
+            }
+        });
+
+    });
 
   });
 

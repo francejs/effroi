@@ -581,22 +581,16 @@ describe("Mouse device", function() {
         after(uninit);
 
         it("should return true if scrolled, false otherwise", function() {
+          assert.equal(mouse.scrollTo(elt.lastChild),
+            (25048>window.innerHeight ? true : false));
+        });
 
-          var dispatched = mouse.scrollTo(elt.lastChild);
-
+        it("should trigger a wheel event on the first element", function() {
           if(25048>window.innerHeight) {
-              assert.equal(dispatched, true);
-
-              it("should trigger a wheel event on the first element", function() {
-                  assert.equal(evts[0].type, type);
-                  assert.equal(evts[0].target, elt.firstChild);
-                  assert.equal(evts[0].currentTarget, elt.firstChild);
-              });
-
-          } else {
-              assert.equal(dispatched, false);
+            assert.equal(evts[0].type, type);
+            assert.equal(evts[0].target, elt.firstChild);
+            assert.equal(evts[0].currentTarget, elt.firstChild);
           }
-
         });
 
     });
