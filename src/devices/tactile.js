@@ -4,12 +4,22 @@ function Tactile() {
   var mouse = require('./mouse.js');
   var utils = require('../utils.js');
 
-  // Detect the tactile device
+  /**
+  * Indicates if tactile zone is available
+  *
+  * @return Boolean
+  */
   this.isConnected = function () {
     return !!('ontouchstart' in window);
   };
 
-  // Touch the screen and release
+  /**
+  * Touch the screen and release immediatly on the given DOM element.
+  *
+  * @param  DOMElement  element   A DOMElement to touch
+  * @param  Object      options   Touch options
+  * @return Boolean
+  */
   this.touch = function (element,options) {
     var dispatched;
     options = options || {};
@@ -23,7 +33,14 @@ function Tactile() {
     return false;
   };
 
-  // Trigger tactile events
+
+  /**
+  * Dispatches a touch event to the given DOM element.
+  *
+  * @param  DOMElement  element   A DOMElement on wich to dispatch the event
+  * @param  Object      options   Event options
+  * @return Boolean
+  */
   this.dispatch = function (element,options) {
     var event = document.createEvent('UIEvent'), fakeEvent={};
     options = options || {};

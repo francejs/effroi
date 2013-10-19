@@ -235,7 +235,7 @@ function Mouse() {
       } catch(e) {
         event = document.createEvent('MouseEvent');
         var fakeEvent = {};
-         utils.setEventCoords(fakeEvent, element);
+        utils.setEventCoords(fakeEvent, element);
         event.initMouseEvent(options.type,
           options.canBubble, options.cancelable,
           options.view, options.detail,
