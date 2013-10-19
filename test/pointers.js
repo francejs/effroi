@@ -60,15 +60,23 @@ if(pointers.isConnected()) {
 
   describe("Pointing device", function() {
 
+    var prefix = (function () {
+      var _prefixed = !!window.navigator.msPointerEnabled;
+      return function (eventType) {
+        return (_prefixed ? 'MSPointer' + eventType[7].toUpperCase()
+            + eventType.substring(8) : eventType);
+      };
+    })();
+
     describe("pointing the screen", function() {
 
       before(function() {
         init();
-        regEventListener(elt, 'MSPointerDown');
-        regEventListener(elt, 'MSPointerUp');
+        regEventListener(elt, prefix('pointerdown'));
+        regEventListener(elt, prefix('pointerup'));
         regEventListener(elt, 'click');
-        regEventListener(document.body, 'MSPointerDown');
-        regEventListener(document.body, 'MSPointerUp');
+        regEventListener(document.body, prefix('pointerdown'));
+        regEventListener(document.body, prefix('pointerup'));
         regEventListener(document.body, 'click');
       });
 
@@ -78,26 +86,26 @@ if(pointers.isConnected()) {
         assert.equal(pointers.point(elt), true);
       });
 
-      it("should trigger a MSPointerDown event on the element", function() {
-        assert.equal(evts[0].type, 'MSPointerDown');
+      it("should trigger a pointerdown event on the element", function() {
+        assert.equal(evts[0].type, prefix('pointerdown'));
         assert.equal(evts[0].target, elt);
         assert.equal(evts[0].currentTarget, elt);
       });
 
-      it("should bubble the MSPointerDown event on the parent", function() {
-        assert.equal(evts[1].type, 'MSPointerDown');
+      it("should bubble the pointerdown event on the parent", function() {
+        assert.equal(evts[1].type, prefix('pointerdown'));
         assert.equal(evts[1].target, elt);
         assert.equal(evts[1].currentTarget, document.body);
       });
 
-      it("should trigger a MSPointerUp event on the element", function() {
-        assert.equal(evts[2].type, 'MSPointerUp');
+      it("should trigger a pointerup event on the element", function() {
+        assert.equal(evts[2].type, prefix('pointerup'));
         assert.equal(evts[2].target, elt);
         assert.equal(evts[2].currentTarget, elt);
       });
 
-      it("should bubble the MSPointerUp event on the parent", function() {
-        assert.equal(evts[3].type, 'MSPointerUp');
+      it("should bubble the pointerup event on the parent", function() {
+        assert.equal(evts[3].type, prefix('pointerup'));
         assert.equal(evts[3].target, elt);
         assert.equal(evts[3].currentTarget, document.body);
       });
@@ -120,11 +128,11 @@ if(pointers.isConnected()) {
 
       before(function() {
         init();
-        regEventListener(elt, 'MSPointerDown', false, true);
-        regEventListener(elt, 'MSPointerUp', false, true);
+        regEventListener(elt, prefix('pointerdown'), false, true);
+        regEventListener(elt, prefix('pointerup'), false, true);
         regEventListener(elt, 'click', false, true);
-        regEventListener(document.body, 'MSPointerDown');
-        regEventListener(document.body, 'MSPointerUp');
+        regEventListener(document.body, prefix('pointerdown'));
+        regEventListener(document.body, prefix('pointerup'));
         regEventListener(document.body, 'click');
       });
 
@@ -134,24 +142,24 @@ if(pointers.isConnected()) {
         assert.equal(pointers.point(elt), true);
       });
 
-      it("should trigger a MSPointerDown event on the element", function() {
-        assert.equal(evts[0].type, 'MSPointerDown');
+      it("should trigger a pointerdown event on the element", function() {
+        assert.equal(evts[0].type, prefix('pointerdown'));
         assert.equal(evts[0].target, elt);
         assert.equal(evts[0].currentTarget, elt);
       });
 
-      it("should not bubble the MSPointerDown event on the parent", function() {
-        assert.notEqual(evts[1].type, 'MSPointerDown');
+      it("should not bubble the pointerdown event on the parent", function() {
+        assert.notEqual(evts[1].type, prefix('pointerdown'));
       });
 
-      it("should trigger a MSPointerUp event on the element", function() {
-        assert.equal(evts[1].type, 'MSPointerUp');
+      it("should trigger a pointerup event on the element", function() {
+        assert.equal(evts[1].type, prefix('pointerup'));
         assert.equal(evts[1].target, elt);
         assert.equal(evts[1].currentTarget, elt);
       });
 
-      it("should not bubble the MSPointerUp event on the parent", function() {
-        assert.notEqual(evts[2].type, 'MSPointerUp');
+      it("should not bubble the pointerup event on the parent", function() {
+        assert.notEqual(evts[2].type, prefix('pointerup'));
       });
 
       it("should trigger a click event on the element", function() {
@@ -166,102 +174,107 @@ if(pointers.isConnected()) {
 
     });
 
-    describe("pointing the screen and cancelling MSPointerUp", function() {
+    describe("pointing the screen and cancelling pointerup", function() {
 
       before(function() {
         init();
-        regEventListener(elt, 'MSPointerDown');
-        regEventListener(elt, 'MSPointerUp', false, false, true);
+        regEventListener(elt, prefix('pointerdown'));
+        regEventListener(elt, prefix('pointerup'), false, false, true);
         regEventListener(elt, 'click');
-        regEventListener(document.body, 'MSPointerDown');
-        regEventListener(document.body, 'MSPointerUp');
+        regEventListener(document.body, prefix('pointerdown'));
+        regEventListener(document.body, prefix('pointerup'));
+        regEventListener(document.body, 'click');
+      });
+
+      after(uninit);
+
+      it("should return false for IE11, true otherwise", function() {
+        assert.equal(pointers.point(elt),
+          window.navigator.msPointerEnabled ? true : false);
+      });
+
+      it("should trigger a pointerdown event on the element", function() {
+        assert.equal(evts[0].type, prefix('pointerdown'));
+        assert.equal(evts[0].target, elt);
+        assert.equal(evts[0].currentTarget, elt);
+      });
+
+      it("should bubble the pointerdown event on the parent", function() {
+        assert.equal(evts[1].type, prefix('pointerdown'));
+        assert.equal(evts[1].target, elt);
+        assert.equal(evts[1].currentTarget, document.body);
+      });
+
+      it("should trigger a pointerup event on the element", function() {
+        assert.equal(evts[2].type, prefix('pointerup'));
+        assert.equal(evts[2].target, elt);
+        assert.equal(evts[2].currentTarget, elt);
+      });
+
+      it("should bubble the pointerup event on the parent", function() {
+        assert.equal(evts[3].type, prefix('pointerup'));
+        assert.equal(evts[3].target, elt);
+        assert.equal(evts[3].currentTarget, document.body);
+      });
+
+      it("should not trigger a click event on the element for IE11", function() {
+        if(window.navigator.pointerEnabled) {
+          assert.equal(evts[4], null);
+        }
+      });
+
+    });
+
+    describe("pointing the screen and cancelling pointerdown", function() {
+
+      before(function() {
+        init();
+        regEventListener(elt, prefix('pointerdown'), false, false, true);
+        regEventListener(elt, prefix('pointerup'));
+        regEventListener(elt, 'click');
+        regEventListener(document.body, prefix('pointerdown'));
+        regEventListener(document.body, prefix('pointerup'));
         regEventListener(document.body, 'click');
       });
 
       after(uninit);
 
       it("should return false", function() {
-        assert.equal(pointers.point(elt), false);
+        assert.equal(pointers.point(elt),
+          window.navigator.msPointerEnabled ? true : false);
       });
 
-      it("should trigger a MSPointerDown event on the element", function() {
-        assert.equal(evts[0].type, 'MSPointerDown');
+      it("should trigger a pointerdown event on the element", function() {
+        assert.equal(evts[0].type, prefix('pointerdown'));
         assert.equal(evts[0].target, elt);
         assert.equal(evts[0].currentTarget, elt);
       });
 
-      it("should bubble the MSPointerDown event on the parent", function() {
-        assert.equal(evts[1].type, 'MSPointerDown');
+      it("should bubble the pointerdown event on the parent", function() {
+        assert.equal(evts[1].type, prefix('pointerdown'));
         assert.equal(evts[1].target, elt);
         assert.equal(evts[1].currentTarget, document.body);
       });
 
-      it("should trigger a MSPointerUp event on the element", function() {
-        assert.equal(evts[2].type, 'MSPointerUp');
+      it("should trigger a pointerup event on the element", function() {
+        assert.equal(evts[2].type, prefix('pointerup'));
         assert.equal(evts[2].target, elt);
         assert.equal(evts[2].currentTarget, elt);
       });
 
-      it("should bubble the MSPointerUp event on the parent", function() {
-        assert.equal(evts[3].type, 'MSPointerUp');
+      it("should bubble the pointerup event on the parent", function() {
+        assert.equal(evts[3].type, prefix('pointerup'));
         assert.equal(evts[3].target, elt);
         assert.equal(evts[3].currentTarget, document.body);
       });
 
-      it("should not trigger a click event on the element", function() {
-        assert.equal(evts[4], null);
+      it("should not trigger a click event on the element for IE11", function() {
+        if(window.navigator.pointerEnabled) {
+          assert.equal(evts[4], null);
+        }
       });
 
     });
-
-    describe("pointing the screen and cancelling MSPointerDown", function() {
-
-      before(function() {
-        init();
-        regEventListener(elt, 'MSPointerDown', false, false, true);
-        regEventListener(elt, 'MSPointerUp');
-        regEventListener(elt, 'click');
-        regEventListener(document.body, 'MSPointerDown');
-        regEventListener(document.body, 'MSPointerUp');
-        regEventListener(document.body, 'click');
-      });
-
-      after(uninit);
-
-      it("should return false", function() {
-        assert.equal(pointers.point(elt), false);
-      });
-
-      it("should trigger a MSPointerDown event on the element", function() {
-        assert.equal(evts[0].type, 'MSPointerDown');
-        assert.equal(evts[0].target, elt);
-        assert.equal(evts[0].currentTarget, elt);
-      });
-
-      it("should bubble the MSPointerDown event on the parent", function() {
-        assert.equal(evts[1].type, 'MSPointerDown');
-        assert.equal(evts[1].target, elt);
-        assert.equal(evts[1].currentTarget, document.body);
-      });
-
-      it("should trigger a MSPointerUp event on the element", function() {
-        assert.equal(evts[2].type, 'MSPointerUp');
-        assert.equal(evts[2].target, elt);
-        assert.equal(evts[2].currentTarget, elt);
-      });
-
-      it("should bubble the MSPointerUp event on the parent", function() {
-        assert.equal(evts[3].type, 'MSPointerUp');
-        assert.equal(evts[3].target, elt);
-        assert.equal(evts[3].currentTarget, document.body);
-      });
-
-      it("should not trigger a click event on the element", function() {
-        assert.equal(evts[4], null);
-      });
-
-    });
-
 
   });
 

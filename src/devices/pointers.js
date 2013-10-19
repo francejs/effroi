@@ -4,13 +4,16 @@ function Pointers () {
   var mouse = require('./mouse.js');
   var utils = require('../utils.js');
 
+  // Private vars
+  var _prefixed = !!window.navigator.msPointerEnabled;
+
   /**
   * Indicates if pointer events are available
   *
   * @return Boolean
   */
   this.isConnected = function () {
-    return window.navigator.msPointerEnabled ? true : false;
+    return _prefixed || window.navigator.pointerEnabled;
   };
 
   /**
@@ -22,13 +25,12 @@ function Pointers () {
   */
   this.point = function (element, options) {
     options=options||{};
-    options.type='MSPointerDown';
+    options.type= 'pointerdown';
     dispatched=this.dispatch(element, options);
+    options.type= 'pointerup';
     // IE10 trigger the click event even if the pointer event is cancelled
-    // should detect IE10 here and impeach dispatched to cancel click
-    // IE11+ fixed the issue.
-    options.type='MSPointerUp';
-    if(this.dispatch(element, options)&&dispatched) {
+    // IE11+ fixed the issue and unprefixed pointer events.
+    if((this.dispatch(element, options)&&dispatched) || _prefixed) {
       options.type='click';
       return mouse.dispatch(element, options);
     }
@@ -44,9 +46,11 @@ function Pointers () {
   */
   this.dispatch = function(element,options) {
     options=options||{};
-    var event = document.createEvent('MSPointerEvent');
+    var event = document.createEvent((_prefixed ? 'MS' : '') + 'PointerEvent');
     utils.setEventCoords(event, element);
-    event.initPointerEvent(options.type,
+    event.initPointerEvent(
+      _prefixed ? 'MSPointer' + options.type[7].toUpperCase()
+        + options.type.substring(8) : options.type,
       'false' === options.canBubble ? false : true,
       'false' === options.cancelable ? false : true,
       options.view||window,
