@@ -5,7 +5,7 @@ function Pointers () {
   var utils = require('../utils.js');
 
   // Consts
-  // Buttons
+  // Buttons : http://msdn.microsoft.com/en-us/library/ie/ff974878(v=vs.85).aspx
   this.LEFT_BUTTON = 1;
   this.RIGHT_BUTTON = 2;
   this.MIDDLE_BUTTON = 4;
@@ -15,7 +15,7 @@ function Pointers () {
   this.BUTTONS_MASK = this.LEFT_BUTTON | this.RIGHT_BUTTON
     | this.MIDDLE_BUTTON | this.BACK_BUTTON | this.FORWARD_BUTTON
     | this.PEN_ERASER_BUTTON;
-  // Pointer types
+  // Pointer types : 
   this.MOUSE = 'mouse';
   this.PEN = 'pen';
   this.TOUCH = 'touch';
@@ -34,6 +34,48 @@ function Pointers () {
   };
 
   /**
+  * Perform a pen pointing on the given DOM element.
+  *
+  * @param  DOMElement  element   A DOMElement to point with the pen
+  * @param  Object      options   Event options
+  * @return Boolean
+  */
+  this.pen = function (element, options) {
+    options = options||{};
+    options.pointerType = this.PEN;
+    options.buttons = this.LEFT_BUTTON;
+    return this.point(element, options);
+  };
+
+  /**
+  * Perform a touch on the given DOM element.
+  *
+  * @param  DOMElement  element   A DOMElement to touch
+  * @param  Object      options   Event options
+  * @return Boolean
+  */
+  this.touch = function (element, options) {
+    options = options||{};
+    options.pointerType = this.TOUCH;
+    options.buttons = this.LEFT_BUTTON;
+    return this.point(element, options);
+  };
+
+  /**
+  * Perform a click on the given DOM element.
+  *
+  * @param  DOMElement  element   A DOMElement to point
+  * @param  Object      options   Event options
+  * @return Boolean
+  */
+  this.click = function (element, options) {
+    options = options||{};
+    options.pointerType = this.MOUSE;
+    options.buttons = this.LEFT_BUTTON;
+    return this.point(element, options);
+  };
+
+  /**
   * Perform a real full pointer "click" on the given DOM element.
   *
   * @param  DOMElement  element   A DOMElement to point
@@ -41,20 +83,20 @@ function Pointers () {
   * @return Boolean
   */
   this.point = function (element, options) {
-    options=options||{};
-    options.type= 'pointerdown';
-    dispatched=this.dispatch(element, options);
-    options.type= 'pointerup';
+    options = options||{};
+    options.type = 'pointerdown';
+    dispatched = this.dispatch(element, options);
+    options.type = 'pointerup';
     dispatched = this.dispatch(element, options)&&dispatched;
     // IE10 trigger the click event even if the pointer event is cancelled
     // also, the click is a MouseEvent
     if(_prefixed) {
-      options.type='click';
+      options.type = 'click';
       return mouse.dispatch(element, options);
     // IE11+ fixed the issue and unprefixed pointer events.
     // The click is a PointerEvent
     } else if(dispatched) {
-      options.type='click';
+      options.type = 'click';
       return this.dispatch(element, options);
     }
     return false;
@@ -68,7 +110,8 @@ function Pointers () {
   * @return Boolean
   */
   this.dispatch = function(element,options) {
-    options=options||{};
+    var button, pointerType;
+    options = options || {};
     if(options.buttons !== options.buttons&this.BUTTONS_MASK) {
       throw Error('Bad value for the "buttons" property.');
     }
@@ -91,6 +134,22 @@ function Pointers () {
     } else {
       button = -1;
     }
+    options.pointerType = options.pointerType || this.UNKNOWN;
+    // IE10 fix for pointer types
+    // http://msdn.microsoft.com/en-us/library/ie/hh772359(v=vs.85).aspx
+    if(_prefixed) {
+      if(options.pointerType == this.MOUSE) {
+        pointerType = 4;
+      } else if(options.pointerType == this.TOUCH) {
+        pointerType = 2;
+      } else if(options.pointerType == this.PEN) {
+        pointerType = 3;
+      } else {
+        pointerType = 0;
+      }
+    } else {
+      pointerType = options.pointerType;
+    }
     var event = document.createEvent((_prefixed ? 'MS' : '') + 'PointerEvent');
     utils.setEventCoords(event, element);
     event.initPointerEvent(
@@ -98,8 +157,7 @@ function Pointers () {
         + options.type.substring(8) : options.type,
       'false' === options.canBubble ? false : true,
       'false' === options.cancelable ? false : true,
-      options.view||window,
-      options.detail||1,
+      options.view||window, options.detail||1,
       options.screenX||0, options.screenY||0,
       options.clientX||0, options.clientY||0,
       !!options.ctrlKey, !!options.altKey,
@@ -109,10 +167,10 @@ function Pointers () {
       options.width||1, options.height||1,
       options.pressure||255, options.rotation||0,
       options.tiltX||0, options.tiltY||0,
-      options.pointerId||1, options.pointerType||this.UNKNOWN,
+      options.pointerId||1, pointerType,
       options.hwTimestamp||Date.now(), options.isPrimary||true);
     utils.setEventProperty(event, 'buttons', options.buttons);
-    utils.setEventProperty(event, 'pointer', options.buttons);
+    utils.setEventProperty(event, 'pointerType', pointerType);
     return element.dispatchEvent(event);
   };
 

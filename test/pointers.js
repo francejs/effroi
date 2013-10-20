@@ -20,6 +20,7 @@ function regEventListener(elt, type, capture, stop, prevent) {
       metaKey : e.metaKey,
       button : e.button,
       buttons : e.buttons,
+      pointerType : e.pointerType,
       view : e.view,
       relatedTarget : e.relatedTarget
     });
@@ -272,6 +273,117 @@ if(pointers.isConnected()) {
         if(window.navigator.pointerEnabled) {
           assert.equal(evts[4], null);
         }
+      });
+
+    });
+
+    describe("clicking the screen", function() {
+
+      before(function() {
+        init();
+        regEventListener(elt, prefix('pointerdown'));
+        regEventListener(elt, prefix('pointerup'));
+        regEventListener(elt, 'click');
+      });
+
+      after(uninit);
+
+      it("should return true", function() {
+        assert.equal(pointers.click(elt), true);
+      });
+
+      if(window.navigator.pointerEnabled) {
+        it("should set pointerType to 'mouse' on IE11+", function() {
+          assert.equal(evts[0].pointerType, 'mouse');
+          assert.equal(evts[1].pointerType, 'mouse');
+          assert.equal(evts[2].pointerType, 'mouse');
+        });
+      } else {
+        it("should set pointerType to 4 on IE10", function() {
+          assert.equal(evts[0].pointerType, 4);
+          assert.equal(evts[1].pointerType, 4);
+          assert.equal(evts[2].pointerType, undefined); // IE10 click is a MouseEvent
+        });
+      }
+
+      it("should set button to 0", function() {
+        assert.equal(evts[0].button, 0);
+        assert.equal(evts[1].button, 0);
+        assert.equal(evts[1].button, 0);
+      });
+
+    });
+
+    describe("touching the screen", function() {
+
+      before(function() {
+        init();
+        regEventListener(elt, prefix('pointerdown'));
+        regEventListener(elt, prefix('pointerup'));
+        regEventListener(elt, 'click');
+      });
+
+      after(uninit);
+
+      it("should return true", function() {
+        assert.equal(pointers.touch(elt), true);
+      });
+
+      if(window.navigator.pointerEnabled) {
+        it("should set pointerType to 'touch' on IE11+", function() {
+          assert.equal(evts[0].pointerType, 'touch');
+          assert.equal(evts[1].pointerType, 'touch');
+          assert.equal(evts[2].pointerType, 'touch');
+        });
+      } else {
+        it("should set pointerType to 2 on IE10", function() {
+          assert.equal(evts[0].pointerType, 2);
+          assert.equal(evts[1].pointerType, 2);
+          assert.equal(evts[2].pointerType, undefined); // IE10 click is a MouseEvent
+        });
+      }
+
+      it("should set button to 0", function() {
+        assert.equal(evts[0].button, 0);
+        assert.equal(evts[1].button, 0);
+        assert.equal(evts[1].button, 0);
+      });
+
+    });
+
+    describe("pointing the screen with a pen", function() {
+
+      before(function() {
+        init();
+        regEventListener(elt, prefix('pointerdown'));
+        regEventListener(elt, prefix('pointerup'));
+        regEventListener(elt, 'click');
+      });
+
+      after(uninit);
+
+      it("should return true", function() {
+        assert.equal(pointers.pen(elt), true);
+      });
+
+      if(window.navigator.pointerEnabled) {
+        it("should set pointerType to 'touch' on IE11+", function() {
+          assert.equal(evts[0].pointerType, 'pen');
+          assert.equal(evts[1].pointerType, 'pen');
+          assert.equal(evts[2].pointerType, 'pen');
+        });
+      } else {
+        it("should set pointerType to 2 on IE10", function() {
+          assert.equal(evts[0].pointerType, 3);
+          assert.equal(evts[1].pointerType, 3);
+          assert.equal(evts[2].pointerType, undefined); // IE10 click is a MouseEvent
+        });
+      }
+
+      it("should set button to 0", function() {
+        assert.equal(evts[0].button, 0);
+        assert.equal(evts[1].button, 0);
+        assert.equal(evts[1].button, 0);
       });
 
     });
