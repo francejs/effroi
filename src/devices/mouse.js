@@ -243,7 +243,7 @@ function Mouse() {
           options.ctrlKey, options.altKey,
           options.shiftKey, options.metaKey,
           button, options.relatedTarget);
-         utils.setEventCoords(event, element);
+        utils.setEventCoords(event, element);
         utils.setEventProperty(event, 'buttons', options.buttons);
       }
       return element.dispatchEvent(event);
