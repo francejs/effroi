@@ -388,6 +388,74 @@ if(pointers.isConnected()) {
 
     });
 
+    describe("clicking an undisplayed element", function() {
+
+        before(function() {
+            init('<p>Text</p><p><a href="#" style="display:none">A link</a></p>');
+        });
+
+        after(uninit);
+
+        it("should throw an exception", function() {
+          assert.throw(function() {
+            pointers.dispatch(elt.lastChild.firstChild, {type: 'pointerdown'});
+          }, Error, 'Unable to find a point in the viewport at wich the'
+            +' given element can receive a pointer event.');
+        });
+
+    });
+
+    describe("clicking an hidden element", function() {
+
+        before(function() {
+            init('<p>Text</p><p><a href="#" style="visibility:hidden">A link</a></p>');
+        });
+
+        after(uninit);
+
+        it("should throw an exception", function() {
+          assert.throw(function() {
+            pointers.dispatch(elt.lastChild.firstChild, {type: 'pointerdown'});
+          }, Error, 'Unable to find a point in the viewport at wich the'
+            +' given element can receive a pointer event.');
+        });
+
+    });
+
+    describe("clicking a pointer disabled element", function() {
+
+        before(function() {
+            init('<p>Text</p><p><a href="#" style="pointer-events:none">A link</a></p>');
+        });
+
+        after(uninit);
+
+        it("should throw an exception", function() {
+          assert.throw(function() {
+            pointers.dispatch(elt.lastChild.firstChild, {type: 'pointerdown'});
+          }, Error, 'Unable to find a point in the viewport at wich the'
+            +' given element can receive a pointer event.');
+        });
+
+    });
+
+    describe("clicking an unclickable element", function() {
+
+        before(function() {
+            init('<p>Text</p><p><a href="#"><span style="display:block; width:100%; height:100%;">A link</span></a></p>');
+        });
+
+        after(uninit);
+
+        it("should throw an exception", function() {
+          assert.throw(function() {
+            pointers.dispatch(elt.lastChild.firstChild, {type: 'pointerdown'});
+          }, Error, 'Unable to find a point in the viewport at wich the'
+            +' given element can receive a pointer event.');
+        });
+
+    });
+
   });
 
 }
