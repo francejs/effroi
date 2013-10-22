@@ -1,6 +1,7 @@
 module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-karma');
     
@@ -25,6 +26,13 @@ module.exports = function(grunt) {
                 configFile: 'karma.conf.js',
                 singleRun: true,
                 browsers: ['Firefox', 'PhantomJS']
+            }
+        },
+
+         watch: {
+            code: {
+                files: ['src/**/*.js'],
+                tasks: ['dist']
             }
         }
     });

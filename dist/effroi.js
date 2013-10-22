@@ -1,4 +1,4 @@
-(function(e){if("function"==typeof bootstrap)bootstrap("effroi",e);else if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else if("undefined"!=typeof ses){if(!ses.ok())return;ses.makeEffroi=e}else"undefined"!=typeof window?window.effroi=e():global.effroi=e()})(function(){var define,ses,bootstrap,module,exports;
+!function(e){"object"==typeof exports?module.exports=e():"function"==typeof define&&define.amd?define(e):"undefined"!=typeof window?window.effroi=e():"undefined"!=typeof global?global.effroi=e():"undefined"!=typeof self&&(self.effroi=e())}(function(){var define,module,exports;
 return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 function Mouse() {
 
@@ -56,7 +56,7 @@ function Mouse() {
 
 module.exports = new Mouse();
 
-},{"../utils.js":4}],2:[function(require,module,exports){
+},{"../utils.js":5}],2:[function(require,module,exports){
 var Tactile=(function () {
 
 	// Neeed mouse to perform click
@@ -96,7 +96,7 @@ var Tactile=(function () {
 		if(!(tactile(element, options)&&dispatched)) {
 			return false;
 		}
-		return mouse.click(element);
+		return !mouse.click(element);
 	}
 
 
@@ -110,11 +110,37 @@ var Tactile=(function () {
 
 module.exports = Tactile;
 
-},{"../utils.js":4,"./mouse.js":1}],3:[function(require,module,exports){
+},{"../utils.js":5,"./mouse.js":1}],3:[function(require,module,exports){
+function Element(selector) {
+    this.selector = selector;
+    this.element = document.querySelector(selector);
+    if (!this.element) {
+        throw new Error("Element not found using selector '" + selector + "'");
+    }
+
+    this.isVisible = function isVisible() {
+        try {
+            var comp = window.getComputedStyle(this.element, null);
+            return comp.visibility !== 'hidden' &&
+                   comp.display !== 'none' &&
+                   this.element.offsetHeight > 0 &&
+                   this.element.offsetWidth > 0;
+        } catch (e) {console.log(e);
+            return false;
+        }
+    };
+}
+
+module.exports = function element(selector) {
+    return new Element(selector);
+};
+},{}],4:[function(require,module,exports){
 module.exports.mouse = require('./devices/mouse.js');
 module.exports.tactile = require('./devices/tactile.js');
 
-},{"./devices/mouse.js":1,"./devices/tactile.js":2}],4:[function(require,module,exports){
+module.exports.element = require('./dsl/element.js');
+
+},{"./devices/mouse.js":1,"./devices/tactile.js":2,"./dsl/element.js":3}],5:[function(require,module,exports){
 module.exports={
 	'setEventCoords': function(event, element) {
 		try {
@@ -128,7 +154,7 @@ module.exports={
 	}
 };
 
-},{}]},{},[3])
-(3)
+},{}]},{},[4])
+(4)
 });
 ;
