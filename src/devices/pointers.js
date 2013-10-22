@@ -110,7 +110,7 @@ function Pointers () {
   * @return Boolean
   */
   this.dispatch = function(element,options) {
-    var button, pointerType;
+    var button, pointerType, event, coords;
     options = options || {};
     if(options.buttons !== options.buttons&this.BUTTONS_MASK) {
       throw Error('Bad value for the "buttons" property.');
@@ -150,7 +150,12 @@ function Pointers () {
     } else {
       pointerType = options.pointerType;
     }
-    var event = document.createEvent((_prefixed ? 'MS' : '') + 'PointerEvent');
+    event = document.createEvent((_prefixed ? 'MS' : '') + 'PointerEvent');
+    coords = utils.getPossiblePointerCoords(element);
+    if(null===coords) {
+      throw Error('Unable to find a point in the viewport at wich the given'
+        +' element can receive a pointer event.');
+    }
     utils.setEventCoords(event, element);
     event.initPointerEvent(
       _prefixed ? 'MSPointer' + options.type[7].toUpperCase()
@@ -158,8 +163,11 @@ function Pointers () {
       'false' === options.canBubble ? false : true,
       'false' === options.cancelable ? false : true,
       options.view||window, options.detail||1,
-      options.screenX||0, options.screenY||0,
-      options.clientX||0, options.clientY||0,
+      // Screen coordinates (relative to the whole user screen)
+      // FIXME: find a way to get the right screen coordinates
+      coords.x + window.screenLeft, coords.y  + window.screenTop,
+      // Client coordinates (relative to the viewport)
+      coords.x, coords.y,
       !!options.ctrlKey, !!options.altKey,
       !!options.shiftKey, !!options.metaKey,
       button, options.relatedTarget||element,

@@ -194,7 +194,7 @@ function Mouse() {
   * @return Boolean
   */
   this.dispatch = function dispatch(element, options) {
-    var event, button;
+    var event, button, coords;
     options = options || {};
     options.type = options.type || 'click';
     if(options.buttons !== options.buttons&this.BUTTONS_MASK) {
@@ -207,6 +207,11 @@ function Mouse() {
     button=( options.buttons&this.RIGHT_BUTTON ? 2 :
       ( options.buttons&this.MIDDLE_BUTTON? 1 : 0 )
     );
+    coords = utils.getPossiblePointerCoords(element);
+    if(null===coords) {
+      throw Error('Unable to find a point in the viewport at wich the given'
+        +' element can receive a mouse event.');
+    }
     options.canBubble = ('false' === options.canBubble ? false : true);
     options.cancelable = ('false' === options.cancelable ? false : true);
     options.view = options.view || window;
@@ -230,20 +235,21 @@ function Mouse() {
         utils.setEventProperty(event, 'buttons', options.buttons);
         utils.setEventProperty(event, 'button', button);
         utils.setEventProperty(event, 'relatedTarget', options.relatedTarget);
-        utils.setEventCoords(event, element);
+        utils.setEventCoords(event, coords.x, coords.y);
       } catch(e) {
         event = document.createEvent('MouseEvent');
-        var fakeEvent = {};
-        utils.setEventCoords(fakeEvent, element);
         event.initMouseEvent(options.type,
           options.canBubble, options.cancelable,
           options.view, options.detail,
-          fakeEvent.screenX, fakeEvent.screenY,
-          fakeEvent.clientX, fakeEvent.clientY,
+          // Screen coordinates (relative to the whole user screen)
+          // FIXME: find a way to get the right screen coordinates
+          coords.x + window.screenLeft, coords.y  + window.screenTop,
+          // Client coordinates (relative to the viewport)
+          coords.x, coords.y,
           options.ctrlKey, options.altKey,
           options.shiftKey, options.metaKey,
           button, options.relatedTarget);
-        utils.setEventCoords(event, element);
+        utils.setEventCoords(event, coords.x, coords.y);
         utils.setEventProperty(event, 'buttons', options.buttons);
       }
       return element.dispatchEvent(event);
