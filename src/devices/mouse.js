@@ -15,13 +15,48 @@ function Mouse() {
   var _x = 1, _y = 1;
 
   /**
+  * Paste content like if it were done by a user with his mouse.
+  *
+  * @param  DOMElement  element   A DOMElement to dblclick
+  * @param  String      content   The content to paste
+  * @return Boolean
+  */
+  this.paste = function paste(element, content) {
+    // The content of a paste is always a string
+    if('string' !== typeof content) {
+      throw Error('Can only paste strings (received '+(typeof content)+').');
+    }
+    this.moveTo(element);
+    options = {};
+    options.type = 'mousedown';
+    if(!this.dispatch(element, options)) {
+      return false;
+    }
+    if(!utils.canAcceptContent(element, content)) {
+      throw Error('Unable to paste content in the given element.');
+    }
+    if(utils.isSelectable(element)) {
+    element.value =
+      (element.selectionStart ?
+        element.value.substr(0, element.selectionStart) : '')
+      + content
+      + (element.selectionEnd ?
+        element.value.substr(element.selectionStart+1, element.selectionEnd) :
+        '');
+    } else {
+      element.value = content;
+    }
+    return utils.dispatch(element, {type: 'input'});
+  };
+
+  /**
   * Perform a real mouse double click on the given DOM element.
   *
   * @param  DOMElement  element   A DOMElement to dblclick
   * @param  Object      options   Clic options
   * @return Boolean
   */
-  this.dblclick = function click(element, options) {
+  this.dblclick = function dblclick(element, options) {
     var dispatched;
     this.moveTo(element);
     options = options||{};

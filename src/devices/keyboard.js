@@ -29,7 +29,8 @@ function Keyboard() {
 			&&('TEXTAREA'===element.nodeName
 			||('INPUT'===element.nodeName&&element.hasAttribute('type')
 				&&'text'===element.getAttribute('type')))) {
-			element.value+=String.fromCharCode(options.keyCode);
+			element.value+=String.fromCharCode(options.charCode);
+			utils.dispatch(element, {type: 'input'});
 		}
 		options.type='keyup';
 		if(!(this.dispatch(element, options)||dispatched)) {

@@ -705,4 +705,70 @@ describe("Mouse device", function() {
 
     });
 
+    describe("pasting with the mouse inside an span element", function() {
+
+        before(function() {
+            init('<p><span>Test</span></p>');
+            regEventListener(elt.firstChild.firstChild, 'mousedown');
+            regEventListener(elt.firstChild.firstChild, 'focus');
+            regEventListener(elt.firstChild.firstChild, 'input');
+        });
+
+        after(uninit);
+
+        it("should throw an exception", function() {
+          assert.throw(function() {
+            mouse.paste(elt.firstChild.firstChild, 'test')
+          }, Error, 'Unable to paste content in the given element.');
+        });
+
+    });
+
+    describe("pasting with the mouse inside an input[type=text] element", function() {
+
+        before(function() {
+            init('<p><label>Text: <input type="text" value="" /></label></p>');
+            regEventListener(elt.firstChild.firstChild.lastChild, 'mousedown');
+            regEventListener(elt.firstChild.firstChild.lastChild, 'mouseup');
+            regEventListener(elt.firstChild.firstChild.lastChild, 'click');
+            regEventListener(elt.firstChild.firstChild.lastChild, 'focus');
+            regEventListener(elt.firstChild.firstChild.lastChild, 'input');
+        });
+
+        after(uninit);
+
+        it("should return true", function() {
+          assert.equal(
+            mouse.paste(elt.firstChild.firstChild.lastChild,'Kikoolol!'),
+            true);
+        });
+
+        it("should change it's value", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.value,'Kikoolol!');
+        });
+
+    });
+
+    describe("pasting with the mouse inside an input[type=text] element where some text is selected", function() {
+
+        before(function() {
+            init('<p><label>Text: <input type="text" value="bob" /></label></p>');
+            elt.firstChild.firstChild.lastChild.selectionStart=1;
+            elt.firstChild.firstChild.lastChild.selectionEnd=2;
+        });
+
+        after(uninit);
+
+        it("should return true", function() {
+          assert.equal(
+            mouse.paste(elt.firstChild.firstChild.lastChild,'00'),
+            true);
+        });
+
+        it("should change it's value", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.value,'b00b');
+        });
+
+    });
+
 });

@@ -53,6 +53,61 @@ module.exports={
     } catch(e) {
       event[property] = value;
     }
+  },
+
+  // Tell if the element can accept the given content
+  canAcceptContent: function(element, content) {
+    if(('TEXTAREA'===element.nodeName
+			||('INPUT'===element.nodeName&&element.hasAttribute('type')
+				&&'text'===element.getAttribute('type')))
+			&&('string' === typeof content
+			  || 'number' === typeof content)) {
+		  return true;
+		} else if(('INPUT'===element.nodeName&&element.hasAttribute('type')
+			&&'number'===element.getAttribute('type'))
+			&& ('number' === typeof content
+			  || Number(content) == content ) ) {
+		  return true;
+		} else if(('INPUT'===element.nodeName&&element.hasAttribute('type')
+				&&'date'===element.getAttribute('type'))
+			&& (content instanceof Date
+				|| Date.parse(content).toString() === content)) {
+		  return true;
+		}
+		return false;
+  },
+
+  // Tell if the element content can be partially selected
+  isSelectable: function(element) {
+    if('TEXTAREA'===element.nodeName
+			||('INPUT'===element.nodeName&&element.hasAttribute('type')
+				&&('text'===element.getAttribute('type')
+			    ||'number'===element.getAttribute('type'))
+			)
+		) {
+		  return true;
+		}
+		return false;
+  },
+
+  // dispatch a simple event
+  dispatch: function(element, options) {
+    var event;
+    options = options || {};
+    options.canBubble = ('false' === options.canBubble ? false : true);
+    options.cancelable = ('false' === options.cancelable ? false : true);
+    options.view = options.view || window;
+    try {
+      event = document.createEvent("Event");
+      event.initEvent(options.type,
+        options.canBubble, options.cancelable);
+      return element.dispatchEvent(event);
+    } catch(e) {
+      return !element.dispatchEvent(event);
+      // old IE fallback
+      event = document.createEventObject();
+      return element.fireEvent('on'+options.type, event)
+    }
   }
 
 };
