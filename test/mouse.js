@@ -20,6 +20,8 @@ function regEventListener(elt, type, capture, stop, prevent) {
       metaKey : e.metaKey,
       button : e.button,
       buttons : e.buttons,
+      charCode : e.charCode,
+      char : e.char,
       pointerType : e.pointerType,
       view : e.view,
       relatedTarget : e.relatedTarget
