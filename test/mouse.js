@@ -752,9 +752,9 @@ describe("Mouse device", function() {
     describe("pasting with the mouse inside an input[type=text] element where some text is selected", function() {
 
         before(function() {
-            init('<p><label>Text: <input type="text" value="bob" /></label></p>');
+            init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
             elt.firstChild.firstChild.lastChild.selectionStart=1;
-            elt.firstChild.firstChild.lastChild.selectionEnd=2;
+            elt.firstChild.firstChild.lastChild.selectionEnd=8;
         });
 
         after(uninit);
@@ -767,6 +767,26 @@ describe("Mouse device", function() {
 
         it("should change it's value", function() {
           assert.equal(elt.firstChild.firstChild.lastChild.value,'b00b');
+        });
+
+    });
+
+    describe("cutting with the mouse the selected text inside an input[type=text]", function() {
+
+        before(function() {
+            init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
+            elt.firstChild.firstChild.lastChild.selectionStart=1;
+            elt.firstChild.firstChild.lastChild.selectionEnd=8;
+        });
+
+        after(uninit);
+
+        it("should return the cutted content", function() {
+          assert.equal(mouse.cut(elt.firstChild.firstChild.lastChild),'ooooooo');
+        });
+
+        it("should change it's value", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.value,'bb');
         });
 
     });

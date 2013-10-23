@@ -15,6 +15,44 @@ function Mouse() {
   var _x = 1, _y = 1;
 
   /**
+  * Cut selected content like if it were done by a user with his mouse.
+  *
+  * @param  DOMElement  element   A DOMElement to dblclick
+  * @param  String      content   The content to paste
+  * @return Boolean
+  */
+  this.cut = function cut(element) {
+    var content;
+    // We move to the element if not over yet
+    this.moveTo(element);
+    // To cut, we right-click but only the mousedown is fired due to the
+    // contextual menu that appears
+    options = {};
+    options.type = 'mousedown';
+    // if the mousedown event is prevented we can't cut content
+    if(!this.dispatch(element, options)) {
+      return '';
+    }
+    // if content is selectable, we cut only the selected content
+    if(utils.isSelectable(element)) {
+      content = element.value.substr(element.selectionStart, element.selectionEnd-1);
+      element.value =
+        (element.selectionStart ?
+          element.value.substr(0, element.selectionStart) : '')
+        + (element.selectionEnd ?
+          element.value.substr(element.selectionEnd) :
+          '');
+    // otherwise we cut the full content
+    } else {
+      content = element.value;
+      element.value = null;
+    }
+    // finally firing an input event
+    utils.dispatch(element, {type: 'input'});
+    return content;
+  };
+
+  /**
   * Paste content like if it were done by a user with his mouse.
   *
   * @param  DOMElement  element   A DOMElement to dblclick
@@ -26,26 +64,31 @@ function Mouse() {
     if('string' !== typeof content) {
       throw Error('Can only paste strings (received '+(typeof content)+').');
     }
-    this.moveTo(element);
-    options = {};
-    options.type = 'mousedown';
-    if(!this.dispatch(element, options)) {
-      return false;
-    }
     if(!utils.canAcceptContent(element, content)) {
       throw Error('Unable to paste content in the given element.');
     }
+    // We move to the element if not over yet
+    this.moveTo(element);
+    options = {};
+    options.type = 'mousedown';
+    // if the mousedown event is prevented we can't paste content
+    if(!this.dispatch(element, options)) {
+      return false;
+    }
+    // if content is selectable, we paste content in the place of the selected content
     if(utils.isSelectable(element)) {
-    element.value =
-      (element.selectionStart ?
-        element.value.substr(0, element.selectionStart) : '')
-      + content
-      + (element.selectionEnd ?
-        element.value.substr(element.selectionStart+1, element.selectionEnd) :
-        '');
+      element.value =
+        (element.selectionStart ?
+          element.value.substr(0, element.selectionStart) : '')
+        + content
+        + (element.selectionEnd ?
+          element.value.substr(element.selectionEnd) :
+          '');
+    // otherwise we just replace the value
     } else {
       element.value = content;
     }
+    // finally firing an input event
     return utils.dispatch(element, {type: 'input'});
   };
 
@@ -58,6 +101,7 @@ function Mouse() {
   */
   this.dblclick = function dblclick(element, options) {
     var dispatched;
+    // We move to the element if not over yet
     this.moveTo(element);
     options = options||{};
     dispatched = this.click(element, options);
@@ -77,6 +121,7 @@ function Mouse() {
   */
   this.click = function click(element, options) {
     var dispatched;
+    // We move to the element if not over yet
     this.moveTo(element);
     options = options||{};
     options.type = 'mousedown';
@@ -98,6 +143,7 @@ function Mouse() {
   */
   this.focus = function focus(element, options) {
     var dispatched, focusEventFired=false;
+    // We move to the element if not over yet
     this.moveTo(element);
     options = options||{};
     options.type = 'mousedown';
