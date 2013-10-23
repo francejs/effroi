@@ -113,6 +113,19 @@ function Mouse() {
   };
 
   /**
+  * Perform a real mouse rightclick on the given DOM element.
+  *
+  * @param  DOMElement  element   A DOMElement to rightclick
+  * @param  Object      options   Clic options
+  * @return Boolean
+  */
+  this.rightclick = function rightclick(element, options) {
+    options = options || {};
+    options.buttons = this.RIGHT_BUTTON;
+    return this.click(element, options);
+  };
+
+  /**
   * Perform a real mouse click on the given DOM element.
   *
   * @param  DOMElement  element   A DOMElement to click
@@ -123,7 +136,7 @@ function Mouse() {
     var dispatched;
     // We move to the element if not over yet
     this.moveTo(element);
-    options = options||{};
+    options = options || {};
     options.type = 'mousedown';
     dispatched = this.dispatch(element, options);
     options.type = 'mouseup';
@@ -145,7 +158,7 @@ function Mouse() {
     var dispatched, focusEventFired=false;
     // We move to the element if not over yet
     this.moveTo(element);
-    options = options||{};
+    options = options || {};
     options.type = 'mousedown';
     dispatched=this.dispatch(element, options);
     // Here, maybe find the first parent element having greater bound rect

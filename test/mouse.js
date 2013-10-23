@@ -771,6 +771,30 @@ describe("Mouse device", function() {
 
     });
 
+    describe("pasting with the mouse inside an input[type=text] element where some text is selected and the mousedown event prevented", function() {
+
+        before(function() {
+            init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
+            elt.firstChild.firstChild.lastChild.selectionStart=1;
+            elt.firstChild.firstChild.lastChild.selectionEnd=8;
+            regEventListener(elt.firstChild.firstChild.lastChild,
+              'mousedown', false, false, true);
+        });
+
+        after(uninit);
+
+        it("should return false", function() {
+          assert.equal(
+            mouse.paste(elt.firstChild.firstChild.lastChild,'00'),
+            false);
+        });
+
+        it("should not change it's value", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.value,'booooooob');
+        });
+
+    });
+
     describe("cutting with the mouse the selected text inside an input[type=text]", function() {
 
         before(function() {
@@ -787,6 +811,28 @@ describe("Mouse device", function() {
 
         it("should change it's value", function() {
           assert.equal(elt.firstChild.firstChild.lastChild.value,'bb');
+        });
+
+    });
+
+    describe("cutting with the mouse the selected text inside an input[type=text] with a mousedown event prevented", function() {
+
+        before(function() {
+            init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
+            elt.firstChild.firstChild.lastChild.selectionStart=1;
+            elt.firstChild.firstChild.lastChild.selectionEnd=8;
+            regEventListener(elt.firstChild.firstChild.lastChild,
+              'mousedown', false, false, true);
+        });
+
+        after(uninit);
+
+        it("should return no content", function() {
+          assert.equal(mouse.cut(elt.firstChild.firstChild.lastChild),'');
+        });
+
+        it("should not change it's value", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.value,'booooooob');
         });
 
     });
