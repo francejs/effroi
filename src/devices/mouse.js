@@ -15,6 +15,52 @@ function Mouse() {
   var _x = 1, _y = 1;
 
   /**
+  * Select content like if it were done by a user with his mouse.
+  *
+  * @param  DOMElement  element   A DOMElement to dblclick
+  * @param  Number      start     The selection start
+  * @param  Number      end     The selection end
+  * @return Boolean
+  */
+  this.select = function cut(element, start, end) {
+    if(!utils.isSelectable(element)) {
+      throw Error('Cannot select the element content.');
+    }
+    if(!start) {
+      start = 0;
+    } else if(start < 0 || start > element.value.length) {
+      throw RangeError('Invalid selection start.');
+    }
+    if(!end) {
+      end = element.value.length;
+    } else if(end > element.value.length || end < start) {
+      throw RangeError('Invalid selection end.');
+    }
+    // We move to the element if not over yet
+    this.moveTo(element);
+    // To select, we keep the mousedown over the input
+    options = {};
+    options.type = 'mousedown';
+    // if the mousedown event is prevented we can't select content
+    if(!this.dispatch(element, options)) {
+      return false;
+    }
+    // We move over the selection to perform
+    // FIXME: This should be done better with real coords
+    options.type = 'mousemove';
+    this.dispatch(element, options);
+    // if the mouseup event is prevented the whole content is selected
+    options.type = 'mouseup';
+    if(!this.dispatch(element, options)) {
+      end = element.value.length;
+    }
+    // finally selecting the content
+    element.selectionStart = start;
+    element.selectionEnd = end;
+    return true;
+  };
+
+  /**
   * Cut selected content like if it were done by a user with his mouse.
   *
   * @param  DOMElement  element   A DOMElement to dblclick

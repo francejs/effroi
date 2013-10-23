@@ -837,4 +837,31 @@ describe("Mouse device", function() {
 
     });
 
+    describe("selecting an input[type=text] content with the mouse", function() {
+
+        before(function() {
+            init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
+            regEventListener(elt.firstChild.firstChild.lastChild, 'mousedown');
+        });
+
+        after(uninit);
+
+        it("should return true", function() {
+          assert.equal(mouse.select(elt.firstChild.firstChild.lastChild, 1, 8), true);
+        });
+
+        it("should not change it's value", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.value,'booooooob');
+        });
+
+        it("set the selection start correctly", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.selectionStart, 1);
+        });
+
+        it("set the selection end correctly", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.selectionEnd, 8);
+        });
+
+    });
+
 });
