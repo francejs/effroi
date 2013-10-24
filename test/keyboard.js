@@ -136,6 +136,10 @@ describe("Keyboard device", function() {
             assert.equal(evts[0].view, window);
         });
 
+        it("should change its value", function() {
+            assert.equal(elt.firstChild.firstChild.lastChild, 'booooooob');
+        });
+
         it("should set the special key property to false", function() {
             assert.equal(evts[0].ctrlKey, false);
             assert.equal(evts[0].altKey, false);
@@ -177,6 +181,94 @@ describe("Keyboard device", function() {
             assert.equal(evts[5].type, 'keyup');
             assert.equal(evts[5].target, elt.firstChild.firstChild.lastChild);
             assert.equal(evts[5].currentTarget, document.body);
+        });
+
+    });
+
+    describe("pasting inside an input[type=text] element where some text is selected", function() {
+
+        before(function() {
+            init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
+            elt.firstChild.firstChild.lastChild.selectionStart=1;
+            elt.firstChild.firstChild.lastChild.selectionEnd=8;
+        });
+
+        after(uninit);
+
+        it("should return true", function() {
+          assert.equal(
+            keyboard.paste(elt.firstChild.firstChild.lastChild,'00'),
+            true);
+        });
+
+        it("should change it's value", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.value,'b00b');
+        });
+
+    });
+
+    describe("pasting inside an input[type=text] element where some text is selected and the keydown event prevented", function() {
+
+        before(function() {
+            init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
+            elt.firstChild.firstChild.lastChild.selectionStart=1;
+            elt.firstChild.firstChild.lastChild.selectionEnd=8;
+            regEventListener(elt.firstChild.firstChild.lastChild,
+              'keydown', false, false, true);
+        });
+
+        after(uninit);
+
+        it("should return false", function() {
+          assert.equal(
+            keyboard.paste(elt.firstChild.firstChild.lastChild,'00'),
+            false);
+        });
+
+        it("should not change it's value", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.value,'booooooob');
+        });
+
+    });
+
+    describe("cutting the selected text inside an input[type=text]", function() {
+
+        before(function() {
+            init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
+            elt.firstChild.firstChild.lastChild.selectionStart=1;
+            elt.firstChild.firstChild.lastChild.selectionEnd=8;
+        });
+
+        after(uninit);
+
+        it("should return the cutted content", function() {
+          assert.equal(keyboard.cut(elt.firstChild.firstChild.lastChild),'ooooooo');
+        });
+
+        it("should change it's value", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.value,'bb');
+        });
+
+    });
+
+    describe("cutting the selected text inside an input[type=text] with a keydown event prevented", function() {
+
+        before(function() {
+            init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
+            elt.firstChild.firstChild.lastChild.selectionStart=1;
+            elt.firstChild.firstChild.lastChild.selectionEnd=8;
+            regEventListener(elt.firstChild.firstChild.lastChild,
+              'keydown', false, false, true);
+        });
+
+        after(uninit);
+
+        it("should return no content", function() {
+          assert.equal(keyboard.cut(elt.firstChild.firstChild.lastChild),'');
+        });
+
+        it("should not change it's value", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.value,'booooooob');
         });
 
     });

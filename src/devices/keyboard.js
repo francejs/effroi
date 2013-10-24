@@ -17,32 +17,46 @@ function Keyboard() {
   this.TAB = '9';
   this.DELETE = '46';
   this.ENTER = '13';
+  this.CTRL = 17;
+  this.CAPS_LOCK = 20;
+  // this.FN = ; Come back later with laptop
+  // this.META = ; Dunno what is the corresponding key
+  this.NUM_LOCK = 144;
+  // this.SCROLL_LOCK = ; Dunno what is the corresponding key
+  this.SHIFT = 16;
+  // this.SYM_LOCK = ; Dunno what is the corresponding key
+  // this.ALT_GR = ; Dunno what is the corresponding key
+  this.OS = 91;
   
   
-  this.ALT = 'Alt';
-  this.ALT_GR = 'AltGraph';
-  this.CAPS_LOCK = 'CapsLock';
-  this.CTRL = 'Control';
-  this.FN = 'Fn';
-  this.META = 'Meta';
-  this.NUM_LOCK = 'NumLock';
-  this.SCROLL_LOCK = 'ScrollLock';  // Can be "Scroll" on IE9
-  this.SHIFT = 'Shift';
-  this.SYM_LOCK = 'SymbolLock';
-  this.OS = 'OS'; // Can be "Win" on IE9
+  this.MODIFIERS = {};
+  this.MODIFIERS[this.ALT] = 'Alt';
+  // this.MODIFIERS[this.ALT_GR] = 'AltGraph'; not supported
+  this.MODIFIERS[this.CAPS_LOCK] = 'CapsLock';
+  this.MODIFIERS[this.CTRL] = 'Control';
+  // this.MODIFIERS[this.FN] = 'Fn'; not supported
+  // this.MODIFIERS[this.META] = 'Meta'; not supported
+  this.MODIFIERS[this.NUM_LOCK] = 'NumLock';
+  // this.MODIFIERS[this.SCROLL_LOCK] = 'ScrollLock',  // Can be "Scroll" on IE9 not supported
+  this.MODIFIERS[this.SHIFT] = 'Shift',
+  // this.MODIFIERS[this.SYM_LOCK] = 'SymbolLock', not supported
+  this.MODIFIERS[this.OS] = 'OS' // Can be "Win" on IE9
 
   // Private vars
   var _downKeys = [], _keyDownDispatched = [];
 
   // Private functions
+
   // Stub for key mapping
   function _getPlatformKey(key) {
     return key;
   }
+
   // Return the char corresponding to the key if any
   function _getCharFromKey(key) {
     return String.fromCharCode(key);
   }
+
   // Try to add the char corresponding to the key to the activeElement
   function _inputKey(key) {
     var char = _getCharFromKey(key);
@@ -54,6 +68,89 @@ function Keyboard() {
 		  utils.dispatch(document.activeElement, {type: 'input'});
 	  }
   }
+
+  // Compute current modifiers
+  function _getModifiers() {
+    var modifiers = '';
+	  if(_downKeys.length) {
+	    for(var i=_downKeys.length-1; i>=0; i--) {
+	      if(this.MODIFERS[_downKeys[i]]) {
+	        modifiers += (modifiers ? ' ' : '') + this.MODIFERS[_downKeys[i]];
+	      }
+	    }
+	  }
+	  return modifiers;
+  }
+
+  /**
+  * Cut selected content like if it were done by a user with Ctrl + X.
+  *
+  * @param  DOMElement  element   A DOMElement to dblclick
+  * @param  String      content   The content to paste
+  * @return Boolean
+  */
+  this.cut = function cut() {
+    var content;
+    // We move to the element if not over yet
+    this.moveTo(element);
+    // if the keydown event is prevented we can't cut content
+    if(!this.down(this.CTRL, 'v'.charCodeAt(0))) {
+      return '';
+    }
+    // if content is selectable, we cut only the selected content
+    if(utils.isSelectable(element)) {
+      content = element.value.substr(element.selectionStart, element.selectionEnd-1);
+      element.value =
+        (element.selectionStart ?
+          element.value.substr(0, element.selectionStart) : '')
+        + (element.selectionEnd ?
+          element.value.substr(element.selectionEnd) :
+          '');
+    // otherwise we cut the full content
+    } else {
+      content = element.value;
+      element.value = null;
+    }
+    // finally firing keyup events
+    this.up(this.CTRL, 'v'.charCodeAt(0));
+    return content;
+  };
+
+  /**
+  * Paste content like if it were done by a user with Ctrl + V.
+  *
+  * @param  DOMElement  element   A DOMElement to dblclick
+  * @param  String      content   The content to paste
+  * @return Boolean
+  */
+  this.paste = function paste(content) {
+    // The content of a paste is always a string
+    if('string' !== typeof content) {
+      throw Error('Can only paste strings (received '+(typeof content)+').');
+    }
+    if(!utils.canAcceptContent(element, content)) {
+      throw Error('Unable to paste content in the given element.');
+    }
+    // if the keydown event is prevented we can't paste content
+    if(!this.down(this.CTRL, 'v'.charCodeAt(0))) {
+      return false;
+    }
+    // if content is selectable, we paste content in the place of the selected content
+    if(utils.isSelectable(element)) {
+      element.value =
+        (element.selectionStart ?
+          element.value.substr(0, element.selectionStart) : '')
+        + content
+        + (element.selectionEnd ?
+          element.value.substr(element.selectionEnd) :
+          '');
+    // otherwise we just replace the value
+    } else {
+      element.value = content;
+    }
+    // finally firing the keyup events
+    return this.up(this.CTRL, 'v'.charCodeAt(0));
+  };
 
   /**
   * Perform a key combination.
@@ -176,35 +273,17 @@ function Keyboard() {
   * @return Boolean
   */
 	this.dispatch = function (element, options) {
-		var event, char, modifiers;
+		var event, char, modifiers = _getModifiers(), location = 0;
 		options=options || {};
     options.canBubble = ('false' === options.canBubble ? false : true);
     options.cancelable = ('false' === options.cancelable ? false : true);
     options.view = options.view || window;
-		options.ctrlKey = !!options.ctrlKey;
-		options.altKey = !!options.altKey;
-		options.shiftKey = !!options.shiftKey;
-		options.metaKey = !!options.metaKey;
 		options.keyCode = options.keyCode|0;
 		options.repeat = !!options.repeat;
-		options.location = options.location|0;
-		options.modifier = options.modifier || '';
 		char = String.fromCharCode(options.keyCode);
 		if(document.createEvent) {
 			event = document.createEvent('KeyboardEvent');
 			if(typeof event.initKeyboardEvent !== 'undefined') {
-			  if(options.shiftKey) {
-			    modifiers += this.SHIFT;
-			  }
-			  if(options.crtlKey) {
-			    modifiers += (modifiers ? ' ' : '') + this.CTRL;
-			  }
-			  if(options.altKey) {
-			    modifiers += (modifiers ? ' ' : '') + this.ALT;
-			  }
-			  if(options.metaKey) {
-			    modifiers += (modifiers ? ' ' : '') + this.META;
-			  }
 				event.initKeyboardEvent(options.type,
 				  'false' === options.canBubble ? false : true,
 				  'false' === options.cancelable ? false : true,
@@ -216,13 +295,18 @@ function Keyboard() {
 				'false' === options.canBubble ? false : true,
 				'false' === options.cancelable ? false : true,
 				options.view||window,
-        options.ctrlKey, options.altKey, options.shiftKey, options.metaKey,
+        -1 !== _downKeys.indexOf(this.CTRL), -1 !== _downKeys.indexOf(this.ALT),
+        -1 !== _downKeys.indexOf(this.SHIFT), -1 !== _downKeys.indexOf(this.META),
         options.keyCode, options.keyCode);
 			}
-      utils.setEventProperty(event, 'ctrlKey', options.ctrlKey);
-      utils.setEventProperty(event, 'altKey', options.altKey);
-      utils.setEventProperty(event, 'shiftKey', options.shiftKey);
-      utils.setEventProperty(event, 'metaKey', options.metaKey);
+      utils.setEventProperty(event, 'ctrlKey',
+        -1 !== _downKeys.indexOf(this.CTRL));
+      utils.setEventProperty(event, 'altKey',
+        -1 !== _downKeys.indexOf(this.ALT));
+      utils.setEventProperty(event, 'shiftKey',
+        -1 !== _downKeys.indexOf(this.SHIFT));
+      utils.setEventProperty(event, 'metaKey',
+        -1 !== _downKeys.indexOf(this.META));
       utils.setEventProperty(event, 'keyCode', options.keyCode);
       utils.setEventProperty(event, 'which', options.keyCode);
       utils.setEventProperty(event, 'charCode', options.keyCode);
@@ -231,10 +315,10 @@ function Keyboard() {
 		} else if(document.createEventObject) {
 			event = document.createEventObject();
 			event.eventType = options.type;
-      event.altKey = options.altKey;
-      event.ctrlKey = options.ctrlKey;
-      event.shiftKey = options.shiftKey;
-      event.metaKey = options.metaKey;
+      event.altKey = -1 !== _downKeys.indexOf(this.ALT);
+      event.ctrlKey = -1 !== _downKeys.indexOf(this.CTRL);
+      event.shiftKey = -1 !== _downKeys.indexOf(this.SHIFT);
+      event.metaKey = -1 !== _downKeys.indexOf(this.META);
 			event.keyCode = options.keyCode;
 			event.charCode = options.keyCode;
 			event.char=char;
