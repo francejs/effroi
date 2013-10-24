@@ -262,7 +262,7 @@ function Mouse() {
 
 module.exports = new Mouse();
 
-},{"../utils.js":6}],2:[function(require,module,exports){
+},{"../utils.js":7}],2:[function(require,module,exports){
 function Pointers () {
 
   // Neeed mouse to perform click
@@ -443,7 +443,7 @@ function Pointers () {
 
 module.exports = new Pointers();
 
-},{"../utils.js":6,"./mouse.js":1}],3:[function(require,module,exports){
+},{"../utils.js":7,"./mouse.js":1}],3:[function(require,module,exports){
 function Tactile() {
 
   // Neeed mouse to perform click
@@ -623,7 +623,7 @@ function Tactile() {
 
 module.exports = new Tactile();
 
-},{"../utils.js":6,"./mouse.js":1}],4:[function(require,module,exports){
+},{"../utils.js":7,"./mouse.js":1}],4:[function(require,module,exports){
 function Element(selector) {
     
     var mouse = require('../devices/mouse.js');
@@ -659,13 +659,46 @@ module.exports = function element(selector) {
     return new Element(selector);
 };
 },{"../devices/mouse.js":1}],5:[function(require,module,exports){
+function Input(elementOrSelector) {
+    if (typeof elementOrSelector == 'string') {
+        this.element = document.querySelector(elementOrSelector);
+        if (!this.element) {
+            throw new Error("Element not found using selector '" + elementOrSelector + "'");
+        }
+    } else {
+        if (!(elementOrSelector instanceof HTMLElement)) {
+            throw new Error("Invalid input() arg: only selector or HTMLElement are supported");
+        }
+        this.element = elementOrSelector;
+    }
+
+    this.val = function val() {
+        return this.element.value;
+    };
+
+    this.set = function set(value) {
+        try {
+            this.element.focus();
+        } catch (e) {
+            throw new Error("Unable to focus() input field " + this.element.getAttribute('name') + ": " + e);
+        }
+
+        this.element.value = value;
+    };
+}
+
+module.exports = function input(elementOrSelector) {
+    return new Input(elementOrSelector);
+};
+},{}],6:[function(require,module,exports){
 module.exports.mouse = require('./devices/mouse.js');
 module.exports.tactile = require('./devices/tactile.js');
 module.exports.pointers = require('./devices/pointers.js');
 
 module.exports.element = require('./dsl/element.js');
+module.exports.input = require('./dsl/input.js');
 
-},{"./devices/mouse.js":1,"./devices/pointers.js":2,"./devices/tactile.js":3,"./dsl/element.js":4}],6:[function(require,module,exports){
+},{"./devices/mouse.js":1,"./devices/pointers.js":2,"./devices/tactile.js":3,"./dsl/element.js":4,"./dsl/input.js":5}],7:[function(require,module,exports){
 module.exports={
 
 	setEventCoords: function(event, element) {
@@ -703,7 +736,7 @@ module.exports={
 
 };
 
-},{}]},{},[5])
-(5)
+},{}]},{},[6])
+(6)
 });
 ;
