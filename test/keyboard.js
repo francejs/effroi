@@ -64,19 +64,16 @@ describe("Keyboard device", function() {
 
         before(function() {
             init();
-            regEventListener(elt, 'keydown');
-            regEventListener(elt, 'keyup');
-            regEventListener(elt, 'keypress');
-            regEventListener(document.body, 'keydown');
-            regEventListener(document.body, 'keyup');
-            regEventListener(document.body, 'keypress');
+            regEventListener(document.activeElement, 'keydown');
+            regEventListener(document.activeElement, 'keypress');
+            regEventListener(document.activeElement, 'keyup');
             
         });
 
         after(uninit);
 
         it("should return true", function() {
-            assert.equal(keyboard.hit(elt, {charCode:'a'.charCodeAt(0)}), true);
+            assert.equal(keyboard.hit('a'.charCodeAt(0)), true);
         });
 
         it("should set the char and charcode property", function() {
@@ -94,39 +91,91 @@ describe("Keyboard device", function() {
             assert.equal(evts[0].metaKey, false);
         });
 
-        it("should trigger a keydown event on the element", function() {
+        it("should trigger a keydown event on the activeElement", function() {
             assert.equal(evts[0].type, 'keydown');
-            assert.equal(evts[0].target, elt);
-            assert.equal(evts[0].currentTarget, elt);
+            assert.equal(evts[0].target, document.activeElement);
         });
 
-        it("should bubble the keydown event on the parent", function() {
-            assert.equal(evts[1].type, 'keydown');
-            assert.equal(evts[1].target, elt);
-            assert.equal(evts[1].currentTarget, document.body);
+        it("should trigger a keypress event on the element", function() {
+            assert.equal(evts[1].type, 'keypress');
+            assert.equal(evts[1].target, document.activeElement);
         });
 
         it("should trigger a keyup event on the element", function() {
             assert.equal(evts[2].type, 'keyup');
-            assert.equal(evts[2].target, elt);
-            assert.equal(evts[2].currentTarget, elt);
+            assert.equal(evts[2].target, document.activeElement);
         });
 
-        it("should bubble the keyup event on the parent", function() {
-            assert.equal(evts[3].type, 'keyup');
-            assert.equal(evts[3].target, elt);
-            assert.equal(evts[3].currentTarget, document.body);
+    });
+
+    describe("hit a key when on an input element", function() {
+
+        before(function() {
+            init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
+            elt.firstChild.firstChild.lastChild.focus();
+            regEventListener(elt.firstChild.firstChild.lastChild, 'keydown');
+            regEventListener(elt.firstChild.firstChild.lastChild, 'keypress');
+            regEventListener(elt.firstChild.firstChild.lastChild, 'keyup');
+            regEventListener(document.body, 'keydown');
+            regEventListener(document.body, 'keypress');
+            regEventListener(document.body, 'keyup');
+            
+        });
+
+        after(uninit);
+
+        it("should return true", function() {
+            assert.equal(keyboard.hit('a'.charCodeAt(0)), true);
+        });
+
+        it("should set the char property correctly", function() {
+            assert.equal(evts[0].char, 'a');
+        });
+
+        it("should set the view property to window", function() {
+            assert.equal(evts[0].view, window);
+        });
+
+        it("should set the special key property to false", function() {
+            assert.equal(evts[0].ctrlKey, false);
+            assert.equal(evts[0].altKey, false);
+            assert.equal(evts[0].shiftKey, false);
+            assert.equal(evts[0].metaKey, false);
+        });
+
+        it("should trigger a keydown event on the activeElement", function() {
+            assert.equal(evts[0].type, 'keydown');
+            assert.equal(evts[0].target, elt.firstChild.firstChild.lastChild);
+            assert.equal(evts[0].currentTarget, elt.firstChild.firstChild.lastChild);
+        });
+
+        it("should bubble the keydown event on the parent", function() {
+            assert.equal(evts[1].type, 'keydown');
+            assert.equal(evts[1].target, elt.firstChild.firstChild.lastChild);
+            assert.equal(evts[1].currentTarget, document.body);
         });
 
         it("should trigger a keypress event on the element", function() {
-            assert.equal(evts[4].type, 'keypress');
-            assert.equal(evts[4].target, elt);
-            assert.equal(evts[4].currentTarget, elt);
+            assert.equal(evts[2].type, 'keypress');
+            assert.equal(evts[2].target, elt.firstChild.firstChild.lastChild);
+            assert.equal(evts[2].currentTarget, elt.firstChild.firstChild.lastChild);
         });
 
         it("should bubble the keypress event on the parent", function() {
-            assert.equal(evts[5].type, 'keypress');
-            assert.equal(evts[5].target, elt);
+            assert.equal(evts[3].type, 'keypress');
+            assert.equal(evts[3].target, elt.firstChild.firstChild.lastChild);
+            assert.equal(evts[3].currentTarget, document.body);
+        });
+
+        it("should trigger a keyup event on the element", function() {
+            assert.equal(evts[4].type, 'keyup');
+            assert.equal(evts[4].target, elt.firstChild.firstChild.lastChild);
+            assert.equal(evts[4].currentTarget, elt.firstChild.firstChild.lastChild);
+        });
+
+        it("should bubble the keyup event on the parent", function() {
+            assert.equal(evts[5].type, 'keyup');
+            assert.equal(evts[5].target, elt.firstChild.firstChild.lastChild);
             assert.equal(evts[5].currentTarget, document.body);
         });
 
