@@ -1,4 +1,7 @@
 function Element(selector) {
+    
+    var mouse = require('../devices/mouse.js');
+
     this.selector = selector;
     this.element = document.querySelector(selector);
     if (!this.element) {
@@ -16,6 +19,14 @@ function Element(selector) {
             return false;
         }
     };
+
+    this.click = function click() {
+        return mouse.click(this.element);
+    }
+
+    this.dblclick = function dblclick() {
+        return mouse.dblclick(this.element);
+    }
 }
 
 module.exports = function element(selector) {

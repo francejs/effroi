@@ -16,6 +16,7 @@ module.exports = function(config) {
     files: [
       'node_modules/mocha/mocha.js',
       'node_modules/chai/chai.js',
+      'node_modules/sinon/pkg/sinon.js',
       'dist/effroi.js',
       'test/**/*.js'
     ],
