@@ -57,23 +57,16 @@ module.exports={
 
   // Tell if the element can accept the given content
   canAcceptContent: function(element, content) {
-    if(('TEXTAREA'===element.nodeName
-			||('INPUT'===element.nodeName&&element.hasAttribute('type')
-				&&'text'===element.getAttribute('type')))
-			&&('string' === typeof content
-			  || 'number' === typeof content)) {
-		  return true;
-		} else if(('INPUT'===element.nodeName&&element.hasAttribute('type')
-			&&'number'===element.getAttribute('type'))
-			&& ('number' === typeof content
-			  || Number(content) == content ) ) {
-		  return true;
-		} else if(('INPUT'===element.nodeName&&element.hasAttribute('type')
-				&&'date'===element.getAttribute('type'))
-			&& (content instanceof Date
-				|| Date.parse(content).toString() === content)) {
-		  return true;
-		}
+    var nodeName = element.nodeName.toLowerCase(),
+        type = element.hasAttribute('type') ? element.getAttribute('type') : null;
+
+    if (nodeName === 'textarea') {
+      return true;
+    }
+    if (nodeName === 'input' 
+      && ['text', 'password', 'number', 'date'].indexOf(type) !== -1) {
+      return true;
+    }
 		return false;
   },
 

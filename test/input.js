@@ -13,28 +13,45 @@ describe("Input DSL", function() {
         document.body.removeChild(document.getElementById('foo'));
     });
 
-    describe("input() with an input[type='text']", function() {
-        beforeEach(function() {
-            createElement('<input type="text" name="bar" value="hello">');
-        });
+    var textInputs = [
+        { 
+            type: "input[type='text']",
+            html: '<input type="text" name="bar" value="hello">'
+        },
+        { 
+            type: "input[type='password']",
+            html: '<input type="password" name="bar" value="hello">'
+        },
+        { 
+            type: "textarea",
+            html: '<textarea name="bar">hello</textarea>'
+        }
+    ];
 
-        describe("val()", function() {
-            it("should return the input value", function() {
-                assert.equal('hello', input('[name="bar"]').val());
+    textInputs.forEach(function(textInput) {
+        describe("input() with an "+textInput.type, function() {
+            beforeEach(function() {
+                createElement(textInput.html);
             });
-        });
 
-        describe("set()", function() {
-            it("should set the input value", function() {
-                input('[name="bar"]').set('salut');
-                assert.equal('salut', document.querySelector('[name="bar"]').value);
+            describe("val()", function() {
+                it("should return the input value", function() {
+                    assert.equal('hello', input('[name="bar"]').val());
+                });
             });
-        });
 
-        describe("fill()", function() {
-            it("can paste the input value", function() {
-                input('[name="bar"]').fill('salut', 'paste');
-                assert.equal('salut', document.querySelector('[name="bar"]').value);
+            describe("set()", function() {
+                it("should set the input value", function() {
+                    input('[name="bar"]').set('salut');
+                    assert.equal('salut', document.querySelector('[name="bar"]').value);
+                });
+            });
+
+            describe("fill()", function() {
+                it("can paste the input value", function() {
+                    input('[name="bar"]').fill('salut', 'paste');
+                    assert.equal('salut', document.querySelector('[name="bar"]').value);
+                });
             });
         });
     });
