@@ -201,7 +201,7 @@ function Mouse() {
   * @return Boolean
   */
   this.focus = function focus(element, options) {
-    var dispatched, focusEventFired=false;
+    var dispatched;
     // We move to the element if not over yet
     this.moveTo(element);
     options = options || {};
@@ -212,15 +212,7 @@ function Mouse() {
     this.moveTo(element.parentNode);
     options.type = 'mouseup';
     this.dispatch(element.parentNode, options);
-    element.addEventListener('focus', function focusListener() {
-      focusEventFired = true;
-      element.removeEventListener('focus', focusListener);
-    });
-    element.focus();
-    if(!focusEventFired) {
-      options.type = 'focus';
-      dispatched = this.dispatch(element, options);
-    }
+    dispatched = utils.focus(element, options);
     return dispatched;
   };
 

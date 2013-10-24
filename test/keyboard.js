@@ -137,7 +137,7 @@ describe("Keyboard device", function() {
         });
 
         it("should change its value", function() {
-            assert.equal(elt.firstChild.firstChild.lastChild, 'booooooob');
+            assert.equal(elt.firstChild.firstChild.lastChild.value, 'boooooooba');
         });
 
         it("should set the special key property to false", function() {
@@ -185,10 +185,70 @@ describe("Keyboard device", function() {
 
     });
 
+    describe("combining ctrl + c", function() {
+
+        before(function() {
+            init();
+            regEventListener(document.body, 'keydown');
+            regEventListener(document.body, 'keypress');
+            regEventListener(document.body, 'keyup');
+            
+        });
+
+        after(uninit);
+
+        it("should return true", function() {
+            assert.equal(keyboard.combine(keyboard.CTRL,
+              'c'.charCodeAt(0)), true);
+        });
+
+        it("should set an empty char property for the CTRL keydown event", function() {
+            assert.equal(evts[0].type, 'keydown');
+            assert.equal(evts[0].char, '');
+        });
+
+        it("should set the ctrlKey property for the CTRL keydown event", function() {
+            (!/phantom/i.test(navigator.userAgent)) &&
+            assert.equal(evts[0].ctrlKey, true);
+        });
+
+        it("should set an empty char property for the c keydown event", function() {
+            assert.equal(evts[1].type, 'keydown');
+            assert.equal(evts[1].char, 'c');
+        });
+
+        it("should set the ctrlKey property for the c keydown event", function() {
+            (!/phantom/i.test(navigator.userAgent)) &&
+            assert.equal(evts[1].ctrlKey, true);
+        });
+
+        it("should set an empty char property for the CTRL keyup event", function() {
+            assert.equal(evts[2].type, 'keyup');
+            assert.equal(evts[2].char, '');
+        });
+
+        it("should set the ctrlKey property for the CTRL keyup event", function() {
+            (!/phantom/i.test(navigator.userAgent)) &&
+            assert.equal(evts[2].ctrlKey, false);
+        });
+
+        it("should set the char property to 'c' for the c keyup event", function() {
+            assert.equal(evts[3].type, 'keyup');
+            assert.equal(evts[3].char, 'c');
+        })
+
+        it("should set the ctrlKey property for the c keyup event", function() {
+            (!/phantom/i.test(navigator.userAgent)) &&
+            assert.equal(evts[3].ctrlKey, false);
+        });
+
+    });
+
     describe("pasting inside an input[type=text] element where some text is selected", function() {
 
         before(function() {
             init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
+            elt.firstChild.firstChild.lastChild.focus();
             elt.firstChild.firstChild.lastChild.selectionStart=1;
             elt.firstChild.firstChild.lastChild.selectionEnd=8;
         });
@@ -196,9 +256,7 @@ describe("Keyboard device", function() {
         after(uninit);
 
         it("should return true", function() {
-          assert.equal(
-            keyboard.paste(elt.firstChild.firstChild.lastChild,'00'),
-            true);
+          assert.equal(keyboard.paste('00'), true);
         });
 
         it("should change it's value", function() {
@@ -211,6 +269,7 @@ describe("Keyboard device", function() {
 
         before(function() {
             init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
+            elt.firstChild.firstChild.lastChild.focus();
             elt.firstChild.firstChild.lastChild.selectionStart=1;
             elt.firstChild.firstChild.lastChild.selectionEnd=8;
             regEventListener(elt.firstChild.firstChild.lastChild,
@@ -221,7 +280,7 @@ describe("Keyboard device", function() {
 
         it("should return false", function() {
           assert.equal(
-            keyboard.paste(elt.firstChild.firstChild.lastChild,'00'),
+            keyboard.paste('00'),
             false);
         });
 
@@ -235,6 +294,7 @@ describe("Keyboard device", function() {
 
         before(function() {
             init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
+            elt.firstChild.firstChild.lastChild.focus();
             elt.firstChild.firstChild.lastChild.selectionStart=1;
             elt.firstChild.firstChild.lastChild.selectionEnd=8;
         });
@@ -242,7 +302,7 @@ describe("Keyboard device", function() {
         after(uninit);
 
         it("should return the cutted content", function() {
-          assert.equal(keyboard.cut(elt.firstChild.firstChild.lastChild),'ooooooo');
+          assert.equal(keyboard.cut(),'ooooooo');
         });
 
         it("should change it's value", function() {
@@ -255,6 +315,7 @@ describe("Keyboard device", function() {
 
         before(function() {
             init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
+            elt.firstChild.firstChild.lastChild.focus();
             elt.firstChild.firstChild.lastChild.selectionStart=1;
             elt.firstChild.firstChild.lastChild.selectionEnd=8;
             regEventListener(elt.firstChild.firstChild.lastChild,
@@ -264,11 +325,39 @@ describe("Keyboard device", function() {
         after(uninit);
 
         it("should return no content", function() {
-          assert.equal(keyboard.cut(elt.firstChild.firstChild.lastChild),'');
+          assert.equal(keyboard.cut(),'');
         });
 
         it("should not change it's value", function() {
           assert.equal(elt.firstChild.firstChild.lastChild.value,'booooooob');
+        });
+
+    });
+
+    describe("setting an input[type=text] as the activeElement with the keyboard", function() {
+
+        before(function() {
+            init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
+            elt.firstChild.firstChild.lastChild.focus();
+            regEventListener(elt.firstChild.firstChild.lastChild, 'mousedown');
+        });
+
+        after(uninit);
+
+        it("should return true", function() {
+          assert.equal(mouse.select(elt.firstChild.firstChild.lastChild, 1, 8), true);
+        });
+
+        it("should not change it's value", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.value,'booooooob');
+        });
+
+        it("set the selection start correctly", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.selectionStart, 1);
+        });
+
+        it("set the selection end correctly", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.selectionEnd, 8);
         });
 
     });

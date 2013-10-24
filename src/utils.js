@@ -83,6 +83,35 @@ module.exports={
 		return false;
   },
 
+  // focus an element an fire blur/focus events if not done automagically
+  focus: function(element, options) {
+    var dispatched, eventFired = false, activeElement = document.activeElement;
+    options = options || {};
+    if(activeElement) {
+      options.type = 'blur'
+      activeElement.addEventListener(options.type, function blurListener() {
+        eventFired = true;
+        activeElement.removeEventListener(options.type, blurListener);
+      });
+      activeElement.blur();
+      if(!eventFired) {
+        this.dispatch(activeElement, options);
+      }
+      eventFired = false;
+    }
+    options.type = 'focus';
+    element.addEventListener(options.type, function focusListener() {
+      eventFired = true;
+      dispatched = !event.defaultPrevented;
+      element.removeEventListener(options.type, focusListener);
+    });
+    element.focus();
+    if(!eventFired) {
+      dispatched = this.dispatch(element, options);
+    }
+    return dispatched;
+  },
+
   // dispatch a simple event
   dispatch: function(element, options) {
     var event;

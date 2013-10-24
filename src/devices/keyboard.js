@@ -43,7 +43,7 @@ function Keyboard() {
   this.MODIFIERS[this.OS] = 'OS' // Can be "Win" on IE9
 
   // Private vars
-  var _downKeys = [], _keyDownDispatched = [];
+  var _downKeys = [], _keyDownDispatched = [], _that=this;
 
   // Private functions
 
@@ -54,6 +54,17 @@ function Keyboard() {
 
   // Return the char corresponding to the key if any
   function _getCharFromKey(key) {
+    // C0 control characters
+    if((key >=0 && key <= 0x1F) || 0x7F === key) {
+      return '';
+    }
+    // C1 control characters
+    if(key >= 0x80 && key <= 0x9F) {
+      return '';
+    }
+    if(-1 !== _downKeys.indexOf(this.CTRL)) {
+      return '';
+    }
     return String.fromCharCode(key);
   }
 
@@ -74,13 +85,44 @@ function Keyboard() {
     var modifiers = '';
 	  if(_downKeys.length) {
 	    for(var i=_downKeys.length-1; i>=0; i--) {
-	      if(this.MODIFERS[_downKeys[i]]) {
-	        modifiers += (modifiers ? ' ' : '') + this.MODIFERS[_downKeys[i]];
+	      if(_that.MODIFIERS[_downKeys[i]]) {
+	        modifiers += (modifiers ? ' ' : '') + _that.MODIFIERS[_downKeys[i]];
 	      }
 	    }
 	  }
 	  return modifiers;
   }
+
+  /**
+  * Tab to the next element
+  *
+  * @param  DOMElement  element   A DOMElement to dblclick
+  * @param  String      content   The content to paste
+  * @return Boolean
+  */
+  this.tab = function tab() {
+    // FIXME: Use tabindex + fallback for querySelector
+    var elements = document.querySelectorAll(
+      'input:not(:disabled), textarea:not(:disabled), '
+      + 'a[href]:not(:disabled):not(:empty), button:not(:disabled), '
+      + 'select:not(:disabled)'
+    );
+    // if nothing/nothing else to focus, fail
+    if(1 >= elements.length) {
+      return false;
+    }
+    // Looking for the activeElement index
+    for(var i=elements.length-1; i>=0; i--) {
+      if(elements[i] === document.activeElement) {
+        break;
+      }
+    }
+    // Hit the tab key
+    this.hit(this.TAB);
+    // Focus the next element
+    return utils.focus(-1 === i || i+1 >= elements.length ?
+      elements[0] : elements[i+1]);
+  };
 
   /**
   * Cut selected content like if it were done by a user with Ctrl + X.
@@ -90,11 +132,9 @@ function Keyboard() {
   * @return Boolean
   */
   this.cut = function cut() {
-    var content;
-    // We move to the element if not over yet
-    this.moveTo(element);
+    var content, element = document.activeElement;
     // if the keydown event is prevented we can't cut content
-    if(!this.down(this.CTRL, 'v'.charCodeAt(0))) {
+    if(!this.down(this.CTRL, 'x'.charCodeAt(0))) {
       return '';
     }
     // if content is selectable, we cut only the selected content
@@ -112,7 +152,7 @@ function Keyboard() {
       element.value = null;
     }
     // finally firing keyup events
-    this.up(this.CTRL, 'v'.charCodeAt(0));
+    this.up(this.CTRL, 'x'.charCodeAt(0));
     return content;
   };
 
@@ -124,6 +164,7 @@ function Keyboard() {
   * @return Boolean
   */
   this.paste = function paste(content) {
+    var element = document.activeElement;
     // The content of a paste is always a string
     if('string' !== typeof content) {
       throw Error('Can only paste strings (received '+(typeof content)+').');
@@ -133,6 +174,7 @@ function Keyboard() {
     }
     // if the keydown event is prevented we can't paste content
     if(!this.down(this.CTRL, 'v'.charCodeAt(0))) {
+      this.up(this.CTRL, 'v'.charCodeAt(0));
       return false;
     }
     // if content is selectable, we paste content in the place of the selected content
@@ -209,16 +251,15 @@ function Keyboard() {
       // check the key is down
       keyIndex = _downKeys.indexOf(key);
       if(-1 === keyIndex) {
-        console.log(i, _downKeys, key)
         throw Error('Can\'t release a key that is not down ('+arguments[i]+')');
       }
+  		// unregister the key
+  		_downKeys.splice(keyIndex, 1);
       // dispatch the keyup event
   		dispatched = this.dispatch(document.activeElement, {
   		    type: 'keyup',
   		    keyCode: key
   		  }) && dispatched;
-  		// unregister the key
-  		_downKeys.splice(keyIndex, 1);
     }
     return dispatched;
   }
@@ -243,13 +284,16 @@ function Keyboard() {
       if(-1 !== _downKeys.indexOf(key)) {
         throw Error('Can\'t push a key already down ('+arguments[i]+')');
       }
+      // register the newly down key
+  		_downKeys.push(key);
       // dispatch the keydown event
   		dispatched = this.dispatch(document.activeElement, {
   		    type: 'keydown',
   		    keyCode: key
   		  }) && dispatched;
       // dispatch the keypress event if the keydown has been dispatched
-      if(dispatched) {
+      // and the CTRL key is not pressed
+      if(dispatched&&-1 === _downKeys.indexOf(this.CTRL)) {
         dispatched = this.dispatch(document.activeElement, {
   		    type: 'keypress',
   		    keyCode: key
@@ -259,8 +303,6 @@ function Keyboard() {
     		  _inputKey(key);
   		  }
       }
-      // register the newly down key
-  		_downKeys.push(key);
     }
     return dispatched;
   }
@@ -280,7 +322,7 @@ function Keyboard() {
     options.view = options.view || window;
 		options.keyCode = options.keyCode|0;
 		options.repeat = !!options.repeat;
-		char = String.fromCharCode(options.keyCode);
+		char = _getCharFromKey(options.keyCode);
 		if(document.createEvent) {
 			event = document.createEvent('KeyboardEvent');
 			if(typeof event.initKeyboardEvent !== 'undefined') {
