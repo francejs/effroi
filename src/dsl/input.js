@@ -1,4 +1,7 @@
 function Input(elementOrSelector) {
+    
+    var mouse = require('../devices/mouse.js');
+
     if (typeof elementOrSelector == 'string') {
         this.element = document.querySelector(elementOrSelector);
         if (!this.element) {
@@ -23,6 +26,15 @@ function Input(elementOrSelector) {
         }
 
         this.element.value = value;
+    };
+
+    this.fill = function fill(value, method) {
+        method = method || 'paste';
+        switch(method) {
+            case 'paste':
+                mouse.paste(this.element, value);
+                break;
+        }
     };
 }
 

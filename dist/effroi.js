@@ -660,6 +660,9 @@ module.exports = function element(selector) {
 };
 },{"../devices/mouse.js":1}],5:[function(require,module,exports){
 function Input(elementOrSelector) {
+    
+    var mouse = require('../devices/mouse.js');
+
     if (typeof elementOrSelector == 'string') {
         this.element = document.querySelector(elementOrSelector);
         if (!this.element) {
@@ -685,12 +688,21 @@ function Input(elementOrSelector) {
 
         this.element.value = value;
     };
+
+    this.fill = function fill(value, method) {
+        method = method || 'paste';
+        switch(method) {
+            case 'paste':
+                mouse.paste(this.element, value);
+                break;
+        }
+    };
 }
 
 module.exports = function input(elementOrSelector) {
     return new Input(elementOrSelector);
 };
-},{}],6:[function(require,module,exports){
+},{"../devices/mouse.js":1}],6:[function(require,module,exports){
 module.exports.mouse = require('./devices/mouse.js');
 module.exports.tactile = require('./devices/tactile.js');
 module.exports.pointers = require('./devices/pointers.js');

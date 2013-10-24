@@ -30,5 +30,12 @@ describe("Input DSL", function() {
                 assert.equal('salut', document.querySelector('[name="bar"]').value);
             });
         });
+
+        describe("fill()", function() {
+            it("can paste the input value", function() {
+                input('[name="bar"]').fill('salut', 'paste');
+                assert.equal('salut', document.querySelector('[name="bar"]').value);
+            });
+        });
     });
 });
