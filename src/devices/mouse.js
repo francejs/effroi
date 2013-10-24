@@ -15,14 +15,139 @@ function Mouse() {
   var _x = 1, _y = 1;
 
   /**
+  * Select content like if it were done by a user with his mouse.
+  *
+  * @param  DOMElement  element   A DOMElement to dblclick
+  * @param  Number      start     The selection start
+  * @param  Number      end     The selection end
+  * @return Boolean
+  */
+  this.select = function cut(element, start, end) {
+    if(!utils.isSelectable(element)) {
+      throw Error('Cannot select the element content.');
+    }
+    if(!start) {
+      start = 0;
+    } else if(start < 0 || start > element.value.length) {
+      throw RangeError('Invalid selection start.');
+    }
+    if(!end) {
+      end = element.value.length;
+    } else if(end > element.value.length || end < start) {
+      throw RangeError('Invalid selection end.');
+    }
+    // We move to the element if not over yet
+    this.moveTo(element);
+    // To select, we keep the mousedown over the input
+    options = {};
+    options.type = 'mousedown';
+    // if the mousedown event is prevented we can't select content
+    if(!this.dispatch(element, options)) {
+      return false;
+    }
+    // We move over the selection to perform
+    // FIXME: This should be done better with real coords
+    options.type = 'mousemove';
+    this.dispatch(element, options);
+    // if the mouseup event is prevented the whole content is selected
+    options.type = 'mouseup';
+    if(!this.dispatch(element, options)) {
+      end = element.value.length;
+    }
+    // finally selecting the content
+    element.selectionStart = start;
+    element.selectionEnd = end;
+    return true;
+  };
+
+  /**
+  * Cut selected content like if it were done by a user with his mouse.
+  *
+  * @param  DOMElement  element   A DOMElement to dblclick
+  * @param  String      content   The content to paste
+  * @return Boolean
+  */
+  this.cut = function cut(element) {
+    var content;
+    // We move to the element if not over yet
+    this.moveTo(element);
+    // To cut, we right-click but only the mousedown is fired due to the
+    // contextual menu that appears
+    options = {};
+    options.type = 'mousedown';
+    // if the mousedown event is prevented we can't cut content
+    if(!this.dispatch(element, options)) {
+      return '';
+    }
+    // if content is selectable, we cut only the selected content
+    if(utils.isSelectable(element)) {
+      content = element.value.substr(element.selectionStart, element.selectionEnd-1);
+      element.value =
+        (element.selectionStart ?
+          element.value.substr(0, element.selectionStart) : '')
+        + (element.selectionEnd ?
+          element.value.substr(element.selectionEnd) :
+          '');
+    // otherwise we cut the full content
+    } else {
+      content = element.value;
+      element.value = null;
+    }
+    // finally firing an input event
+    utils.dispatch(element, {type: 'input'});
+    return content;
+  };
+
+  /**
+  * Paste content like if it were done by a user with his mouse.
+  *
+  * @param  DOMElement  element   A DOMElement to dblclick
+  * @param  String      content   The content to paste
+  * @return Boolean
+  */
+  this.paste = function paste(element, content) {
+    // The content of a paste is always a string
+    if('string' !== typeof content) {
+      throw Error('Can only paste strings (received '+(typeof content)+').');
+    }
+    if(!utils.canAcceptContent(element, content)) {
+      throw Error('Unable to paste content in the given element.');
+    }
+    // We move to the element if not over yet
+    this.moveTo(element);
+    options = {};
+    options.type = 'mousedown';
+    // if the mousedown event is prevented we can't paste content
+    if(!this.dispatch(element, options)) {
+      return false;
+    }
+    // if content is selectable, we paste content in the place of the selected content
+    if(utils.isSelectable(element)) {
+      element.value =
+        (element.selectionStart ?
+          element.value.substr(0, element.selectionStart) : '')
+        + content
+        + (element.selectionEnd ?
+          element.value.substr(element.selectionEnd) :
+          '');
+    // otherwise we just replace the value
+    } else {
+      element.value = content;
+    }
+    // finally firing an input event
+    return utils.dispatch(element, {type: 'input'});
+  };
+
+  /**
   * Perform a real mouse double click on the given DOM element.
   *
   * @param  DOMElement  element   A DOMElement to dblclick
   * @param  Object      options   Clic options
   * @return Boolean
   */
-  this.dblclick = function click(element, options) {
+  this.dblclick = function dblclick(element, options) {
     var dispatched;
+    // We move to the element if not over yet
     this.moveTo(element);
     options = options||{};
     dispatched = this.click(element, options);
@@ -34,6 +159,19 @@ function Mouse() {
   };
 
   /**
+  * Perform a real mouse rightclick on the given DOM element.
+  *
+  * @param  DOMElement  element   A DOMElement to rightclick
+  * @param  Object      options   Clic options
+  * @return Boolean
+  */
+  this.rightclick = function rightclick(element, options) {
+    options = options || {};
+    options.buttons = this.RIGHT_BUTTON;
+    return this.click(element, options);
+  };
+
+  /**
   * Perform a real mouse click on the given DOM element.
   *
   * @param  DOMElement  element   A DOMElement to click
@@ -42,8 +180,9 @@ function Mouse() {
   */
   this.click = function click(element, options) {
     var dispatched;
+    // We move to the element if not over yet
     this.moveTo(element);
-    options = options||{};
+    options = options || {};
     options.type = 'mousedown';
     dispatched = this.dispatch(element, options);
     options.type = 'mouseup';
@@ -63,8 +202,9 @@ function Mouse() {
   */
   this.focus = function focus(element, options) {
     var dispatched, focusEventFired=false;
+    // We move to the element if not over yet
     this.moveTo(element);
-    options = options||{};
+    options = options || {};
     options.type = 'mousedown';
     dispatched=this.dispatch(element, options);
     // Here, maybe find the first parent element having greater bound rect
@@ -194,7 +334,7 @@ function Mouse() {
   * @return Boolean
   */
   this.dispatch = function dispatch(element, options) {
-    var event, button;
+    var event, button, coords;
     options = options || {};
     options.type = options.type || 'click';
     if(options.buttons !== options.buttons&this.BUTTONS_MASK) {
@@ -207,6 +347,11 @@ function Mouse() {
     button=( options.buttons&this.RIGHT_BUTTON ? 2 :
       ( options.buttons&this.MIDDLE_BUTTON? 1 : 0 )
     );
+    coords = utils.getPossiblePointerCoords(element);
+    if(null===coords) {
+      throw Error('Unable to find a point in the viewport at wich the given'
+        +' element can receive a mouse event.');
+    }
     options.canBubble = ('false' === options.canBubble ? false : true);
     options.cancelable = ('false' === options.cancelable ? false : true);
     options.view = options.view || window;
@@ -230,20 +375,21 @@ function Mouse() {
         utils.setEventProperty(event, 'buttons', options.buttons);
         utils.setEventProperty(event, 'button', button);
         utils.setEventProperty(event, 'relatedTarget', options.relatedTarget);
-        utils.setEventCoords(event, element);
+        utils.setEventCoords(event, coords.x, coords.y);
       } catch(e) {
         event = document.createEvent('MouseEvent');
-        var fakeEvent = {};
-        utils.setEventCoords(fakeEvent, element);
         event.initMouseEvent(options.type,
           options.canBubble, options.cancelable,
           options.view, options.detail,
-          fakeEvent.screenX, fakeEvent.screenY,
-          fakeEvent.clientX, fakeEvent.clientY,
+          // Screen coordinates (relative to the whole user screen)
+          // FIXME: find a way to get the right screen coordinates
+          coords.x + window.screenLeft, coords.y  + window.screenTop,
+          // Client coordinates (relative to the viewport)
+          coords.x, coords.y,
           options.ctrlKey, options.altKey,
           options.shiftKey, options.metaKey,
           button, options.relatedTarget);
-        utils.setEventCoords(event, element);
+        utils.setEventCoords(event, coords.x, coords.y);
         utils.setEventProperty(event, 'buttons', options.buttons);
       }
       return element.dispatchEvent(event);

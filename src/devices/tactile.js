@@ -129,7 +129,7 @@ function Tactile() {
   * @return Boolean
   */
   this.dispatch = function (element,options) {
-    var event = document.createEvent('UIEvent'), fakeEvent={};
+    var event = document.createEvent('UIEvent'), coords;
     options = options || {};
     options.canBubble = ('false' === options.canBubble ? false : true);
     options.cancelable = ('false' === options.cancelable ? false : true);
@@ -143,19 +143,26 @@ function Tactile() {
     options.touches = options.touches | [];
     options.scale = options.scale || 1.0;
     options.rotation = options.rotation || 0.0;
+    coords = utils.getPossiblePointerCoords(element);
+    if(null===coords) {
+      throw Error('Unable to find a point in the viewport at wich the given'
+        +' element can receive a touch event.');
+    }
     // Safari, Firefox: must use initTouchEvent.
     if ("function" === typeof event.initTouchEvent) {
-        utils.setEventCoords(fakeEvent, element);
         event.initTouchEvent(options.type,
           options.canBubble, options.cancelable,
           options.view, options.detail,
-          fakeEvent.screenX, fakeEvent.screenY,
-          fakeEvent.clientX, fakeEvent.clientY,
+          // Screen coordinates (relative to the whole user screen)
+          // FIXME: find a way to get the right screen coordinates
+          coords.x + window.screenLeft, coords.y  + window.screenTop,
+          // Client coordinates (relative to the viewport)
+          coords.x, coords.y,
           options.ctrlKey, options.altKey,
           options.shiftKey, options.metaKey,
           options.touches, options.targetTouches, options.changedTouches,
           options.scale, options.rotation);
-        utils.setEventCoords(event, element);
+        utils.setEventCoords(event, coords.x, coords.y);
     } else {
         event.initUIEvent(options.type,
           options.canBubble, options.cancelable,
@@ -168,7 +175,7 @@ function Tactile() {
         utils.setEventProperty(event, 'touches', options.touches);
         utils.setEventProperty(event, 'scale', options.scale);
         utils.setEventProperty(event, 'rotation', options.rotation);
-        utils.setEventCoords(event, element);
+        utils.setEventCoords(event, coords.x, coords.y);
     }
     return element.dispatchEvent(event);
   };

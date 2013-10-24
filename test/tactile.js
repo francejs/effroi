@@ -20,6 +20,8 @@ function regEventListener(elt, type, capture, stop, prevent) {
       metaKey : e.metaKey,
       button : e.button,
       buttons : e.buttons,
+      charCode : e.charCode,
+      char : e.char,
       pointerType : e.pointerType,
       view : e.view,
       relatedTarget : e.relatedTarget
@@ -368,6 +370,74 @@ if(tactile.isConnected()) {
             if((25048>window.innerHeight)) {
               assert.equal(evts[0].type, 'touchstart');
             }
+        });
+
+    });
+
+    describe("touching an undisplayed element", function() {
+
+        before(function() {
+            init('<p>Text</p><p><a href="#" style="display:none">A link</a></p>');
+        });
+
+        after(uninit);
+
+        it("should throw an exception", function() {
+          assert.throw(function() {
+            tactile.dispatch(elt.lastChild.firstChild, {type: 'touchstart'});
+          }, Error, 'Unable to find a point in the viewport at wich the'
+            +' given element can receive a touch event.');
+        });
+
+    });
+
+    describe("touching an hidden element", function() {
+
+        before(function() {
+            init('<p>Text</p><p><a href="#" style="visibility:hidden">A link</a></p>');
+        });
+
+        after(uninit);
+
+        it("should throw an exception", function() {
+          assert.throw(function() {
+            tactile.dispatch(elt.lastChild.firstChild, {type: 'touchstart'});
+          }, Error, 'Unable to find a point in the viewport at wich the'
+            +' given element can receive a touch event.');
+        });
+
+    });
+
+    describe("touching a pointer disabled element", function() {
+
+        before(function() {
+            init('<p>Text</p><p><a href="#" style="pointer-events:none">A link</a></p>');
+        });
+
+        after(uninit);
+
+        it("should throw an exception", function() {
+          assert.throw(function() {
+            tactile.dispatch(elt.lastChild.firstChild, {type: 'touchstart'});
+          }, Error, 'Unable to find a point in the viewport at wich the'
+            +' given element can receive a touch event.');
+        });
+
+    });
+
+    describe("touching an unclickable element", function() {
+
+        before(function() {
+            init('<p>Text</p><p><a href="#"><span style="display:block; width:100%; height:100%;">A link</span></a></p>');
+        });
+
+        after(uninit);
+
+        it("should throw an exception", function() {
+          assert.throw(function() {
+            tactile.dispatch(elt.lastChild.firstChild, {type: 'touchstart'});
+          }, Error, 'Unable to find a point in the viewport at wich the'
+            +' given element can receive a touch event.');
         });
 
     });

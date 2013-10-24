@@ -20,6 +20,8 @@ function regEventListener(elt, type, capture, stop, prevent) {
       metaKey : e.metaKey,
       button : e.button,
       buttons : e.buttons,
+      charCode : e.charCode,
+      char : e.char,
       pointerType : e.pointerType,
       view : e.view,
       relatedTarget : e.relatedTarget
@@ -631,6 +633,233 @@ describe("Mouse device", function() {
           assert.equal(evts[2].type, 'focus');
           assert.equal(evts[2].target, elt.lastChild.firstChild);
           assert.equal(evts[2].currentTarget, elt.lastChild.firstChild);
+        });
+
+    });
+
+    describe("clicking an undisplayed element", function() {
+
+        before(function() {
+            init('<p>Text</p><p><a href="#" style="display:none">A link</a></p>');
+        });
+
+        after(uninit);
+
+        it("should throw an exception", function() {
+          assert.throw(function() {
+            mouse.click(elt.lastChild.firstChild)
+          }, Error, 'Unable to find a point in the viewport at wich the'
+            +' given element can receive a mouse event.');
+        });
+
+    });
+
+    describe("clicking an hidden element", function() {
+
+        before(function() {
+            init('<p>Text</p><p><a href="#" style="visibility:hidden">A link</a></p>');
+        });
+
+        after(uninit);
+
+        it("should throw an exception", function() {
+          assert.throw(function() {
+            mouse.click(elt.lastChild.firstChild)
+          }, Error, 'Unable to find a point in the viewport at wich the'
+            +' given element can receive a mouse event.');
+        });
+
+    });
+
+    describe("clicking a pointer disabled element", function() {
+
+        before(function() {
+            init('<p>Text</p><p><a href="#" style="pointer-events:none">A link</a></p>');
+        });
+
+        after(uninit);
+
+        it("should throw an exception", function() {
+          assert.throw(function() {
+            mouse.click(elt.lastChild.firstChild)
+          }, Error, 'Unable to find a point in the viewport at wich the'
+            +' given element can receive a mouse event.');
+        });
+
+    });
+
+    describe("clicking an unclickable element", function() {
+
+        before(function() {
+            init('<p>Text</p><p><a href="#"><span style="display:block; width:100%; height:100%;">A link</span></a></p>');
+        });
+
+        after(uninit);
+
+        it("should throw an exception", function() {
+          assert.throw(function() {
+            mouse.click(elt.lastChild.firstChild)
+          }, Error, 'Unable to find a point in the viewport at wich the'
+            +' given element can receive a mouse event.');
+        });
+
+    });
+
+    describe("pasting with the mouse inside an span element", function() {
+
+        before(function() {
+            init('<p><span>Test</span></p>');
+            regEventListener(elt.firstChild.firstChild, 'mousedown');
+            regEventListener(elt.firstChild.firstChild, 'focus');
+            regEventListener(elt.firstChild.firstChild, 'input');
+        });
+
+        after(uninit);
+
+        it("should throw an exception", function() {
+          assert.throw(function() {
+            mouse.paste(elt.firstChild.firstChild, 'test')
+          }, Error, 'Unable to paste content in the given element.');
+        });
+
+    });
+
+    describe("pasting with the mouse inside an input[type=text] element", function() {
+
+        before(function() {
+            init('<p><label>Text: <input type="text" value="" /></label></p>');
+            regEventListener(elt.firstChild.firstChild.lastChild, 'mousedown');
+            regEventListener(elt.firstChild.firstChild.lastChild, 'mouseup');
+            regEventListener(elt.firstChild.firstChild.lastChild, 'click');
+            regEventListener(elt.firstChild.firstChild.lastChild, 'focus');
+            regEventListener(elt.firstChild.firstChild.lastChild, 'input');
+        });
+
+        after(uninit);
+
+        it("should return true", function() {
+          assert.equal(
+            mouse.paste(elt.firstChild.firstChild.lastChild,'Kikoolol!'),
+            true);
+        });
+
+        it("should change it's value", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.value,'Kikoolol!');
+        });
+
+    });
+
+    describe("pasting with the mouse inside an input[type=text] element where some text is selected", function() {
+
+        before(function() {
+            init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
+            elt.firstChild.firstChild.lastChild.selectionStart=1;
+            elt.firstChild.firstChild.lastChild.selectionEnd=8;
+        });
+
+        after(uninit);
+
+        it("should return true", function() {
+          assert.equal(
+            mouse.paste(elt.firstChild.firstChild.lastChild,'00'),
+            true);
+        });
+
+        it("should change it's value", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.value,'b00b');
+        });
+
+    });
+
+    describe("pasting with the mouse inside an input[type=text] element where some text is selected and the mousedown event prevented", function() {
+
+        before(function() {
+            init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
+            elt.firstChild.firstChild.lastChild.selectionStart=1;
+            elt.firstChild.firstChild.lastChild.selectionEnd=8;
+            regEventListener(elt.firstChild.firstChild.lastChild,
+              'mousedown', false, false, true);
+        });
+
+        after(uninit);
+
+        it("should return false", function() {
+          assert.equal(
+            mouse.paste(elt.firstChild.firstChild.lastChild,'00'),
+            false);
+        });
+
+        it("should not change it's value", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.value,'booooooob');
+        });
+
+    });
+
+    describe("cutting with the mouse the selected text inside an input[type=text]", function() {
+
+        before(function() {
+            init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
+            elt.firstChild.firstChild.lastChild.selectionStart=1;
+            elt.firstChild.firstChild.lastChild.selectionEnd=8;
+        });
+
+        after(uninit);
+
+        it("should return the cutted content", function() {
+          assert.equal(mouse.cut(elt.firstChild.firstChild.lastChild),'ooooooo');
+        });
+
+        it("should change it's value", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.value,'bb');
+        });
+
+    });
+
+    describe("cutting with the mouse the selected text inside an input[type=text] with a mousedown event prevented", function() {
+
+        before(function() {
+            init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
+            elt.firstChild.firstChild.lastChild.selectionStart=1;
+            elt.firstChild.firstChild.lastChild.selectionEnd=8;
+            regEventListener(elt.firstChild.firstChild.lastChild,
+              'mousedown', false, false, true);
+        });
+
+        after(uninit);
+
+        it("should return no content", function() {
+          assert.equal(mouse.cut(elt.firstChild.firstChild.lastChild),'');
+        });
+
+        it("should not change it's value", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.value,'booooooob');
+        });
+
+    });
+
+    describe("selecting an input[type=text] content with the mouse", function() {
+
+        before(function() {
+            init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
+            regEventListener(elt.firstChild.firstChild.lastChild, 'mousedown');
+        });
+
+        after(uninit);
+
+        it("should return true", function() {
+          assert.equal(mouse.select(elt.firstChild.firstChild.lastChild, 1, 8), true);
+        });
+
+        it("should not change it's value", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.value,'booooooob');
+        });
+
+        it("set the selection start correctly", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.selectionStart, 1);
+        });
+
+        it("set the selection end correctly", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild.selectionEnd, 8);
         });
 
     });
