@@ -100,7 +100,7 @@ module.exports={
       eventFired = false;
     }
     options.type = 'focus';
-    element.addEventListener(options.type, function focusListener() {
+    element.addEventListener(options.type, function focusListener(event) {
       eventFired = true;
       dispatched = !event.defaultPrevented;
       element.removeEventListener(options.type, focusListener);
