@@ -9,7 +9,7 @@ function Tactile() {
   *
   * @return Boolean
   */
-  this.isConnected = function () { return true;
+  this.isConnected = function () {
     return !!('ontouchstart' in window);
   };
 
