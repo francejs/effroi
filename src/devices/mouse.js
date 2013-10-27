@@ -353,22 +353,32 @@ function Mouse() {
     options.shiftKey = !!options.shiftKey;
     options.metaKey = !!options.metaKey;
     options.relatedTarget = options.relatedTarget||null;
-    if(document.createEvent) {
-      try {
-        event = new MouseEvent(options.type, {
-          'view': options.view,
-          'bubbles': options.canBubble,
-          'cancelable': options.cancelable
-        });
-        utils.setEventProperty(event, 'altKey', options.altKey);
-        utils.setEventProperty(event, 'ctrlKey', options.ctrlKey);
-        utils.setEventProperty(event, 'shiftKey', options.shiftKey);
-        utils.setEventProperty(event, 'metaKey', options.metaKey);
-        utils.setEventProperty(event, 'buttons', options.buttons);
-        utils.setEventProperty(event, 'button', button);
-        utils.setEventProperty(event, 'relatedTarget', options.relatedTarget);
-        utils.setEventCoords(event, coords.x, coords.y);
-      } catch(e) {
+    // try to use the constructor (recommended with DOM level 3)
+    // http://www.w3.org/TR/DOM-Level-3-Events/#new-event-interface-initializers
+    try {
+      event = new MouseEvent(options.type, {
+        bubbles: options.canBubble,
+        cancelable: options.cancelable,
+        view: options.view,
+        // FIXME: find a way to get the right screen coordinates
+        screenX: coords.x + window.screenLeft,
+        screenY: coords.y  + window.screenTop,
+        clientX: coords.x,
+        clientY: coords.y,
+        altKey: options.altKey,
+        ctrlKey: options.ctrlKey,
+        shiftKey: options.shiftKey,
+        metaKey: options.metaKey,
+        button: button,
+        buttons: options.buttons,
+        relatedTarget: options.relatedTarget
+      });
+      // Chrome seems to not set the buttons property properly
+      utils.setEventProperty(event, 'buttons', options.buttons);
+      return element.dispatchEvent(event);
+    } catch(e) {
+      // old fashined event intializer
+      if(document.createEvent) {
         event = document.createEvent('MouseEvent');
         event.initMouseEvent(options.type,
           options.canBubble, options.cancelable,
@@ -383,14 +393,15 @@ function Mouse() {
           button, options.relatedTarget);
         utils.setEventCoords(event, coords.x, coords.y);
         utils.setEventProperty(event, 'buttons', options.buttons);
+        return element.dispatchEvent(event);
+      // old IE event initializer
+      } else if(document.createEventObject) {
+        event = document.createEventObject();
+        event.eventType = options.type;
+        event.button = button;
+        event.buttons = option.buttons;
+        return element.fireEvent('on'+options.type, event);
       }
-      return element.dispatchEvent(event);
-    } else if(document.createEventObject) {
-      event = document.createEventObject();
-      event.eventType = options.type;
-      event.button = button;
-      event.buttons = option.buttons;
-      return element.fireEvent('on'+options.type, event);
     }
   };
 

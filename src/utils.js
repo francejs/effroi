@@ -116,7 +116,7 @@ module.exports={
     options.type = 'focus';
     element.addEventListener(options.type, function focusListener(evt) {
       eventFired = true;
-      dispatched = !event.defaultPrevented;
+      dispatched = !evt.defaultPrevented;
       element.removeEventListener(options.type, focusListener, true);
     });
     element.focus();
@@ -161,8 +161,13 @@ module.exports={
     try {
       // First try to use the constructor
       try {
-        var event = new FocusEvent(type, canBubble, cancelable, window, 0,
-            relatedTarget);
+        var event = new FocusEvent(type, {
+          bubbles: canBubble,
+          cancelable: cancelable,
+          view: window,
+          detail: 0,
+          relatedTarget: relatedTarget
+        });
       } catch(e) {
         // the standard interface is FocusEvent, but not always provided
         if('FocusEvent' in window) {
