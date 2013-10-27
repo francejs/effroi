@@ -9,7 +9,7 @@ function Tactile() {
   *
   * @return Boolean
   */
-  this.isConnected = function () {
+  this.isConnected = function () { return true;
     return !!('ontouchstart' in window);
   };
 
@@ -139,8 +139,8 @@ function Tactile() {
     options.ctrlKey = !!options.ctrlKey;
     options.shiftKey = !!options.shiftKey;
     options.metaKey = !!options.metaKey;
-    options.changedTouches = options.changedTouches || [];
-    options.touches = options.touches | [];
+    options.changedTouches = options.changedTouches || [];
+    options.touches = options.touches || [];
     options.scale = options.scale || 1.0;
     options.rotation = options.rotation || 0.0;
     coords = utils.getPossiblePointerCoords(element);

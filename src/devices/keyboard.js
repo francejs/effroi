@@ -94,19 +94,37 @@ function Keyboard() {
   }
 
   /**
+  * Focus an element by using tab
+  *
+  * @param  DOMElement  element   A DOMElement to tab to
+  * @return Boolean
+  */
+  this.focus = function focus(element) {
+    var activeElement = document.activeElement;
+    // If the element is already focused return false
+    if(activeElement === element) {
+      return false;
+    }
+    // Performing a first tab
+    this.tab();
+    activeElement = document.activeElement;
+    while(activeElement != element && this.tab()
+      && activeElement != document.activeElement) {
+      continue;
+    }
+    if(activeElement !== element) {
+      return false;
+    }
+    return true;
+  };
+
+  /**
   * Tab to the next element
   *
-  * @param  DOMElement  element   A DOMElement to dblclick
-  * @param  String      content   The content to paste
   * @return Boolean
   */
   this.tab = function tab() {
-    // FIXME: Use tabindex + fallback for querySelector
-    var elements = document.querySelectorAll(
-      'input:not(:disabled), textarea:not(:disabled), '
-      + 'a[href]:not(:disabled):not(:empty), button:not(:disabled), '
-      + 'select:not(:disabled)'
-    );
+    var elements = utils.getFocusableElements(), dispatched;
     // if nothing/nothing else to focus, fail
     if(1 >= elements.length) {
       return false;
@@ -117,11 +135,14 @@ function Keyboard() {
         break;
       }
     }
-    // Hit the tab key
-    this.hit(this.TAB);
+    // Push the tab key down
+    this.down(this.TAB);
     // Focus the next element
-    return utils.focus(-1 === i || i+1 >= elements.length ?
+    dispatched = utils.focus(-1 === i || i+1 >= elements.length ?
       elements[0] : elements[i+1]);
+    // Release the tab key
+    this.up(this.TAB);
+    return dispatched;
   };
 
   /**

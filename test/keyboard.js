@@ -334,30 +334,75 @@ describe("Keyboard device", function() {
 
     });
 
-    describe("setting an input[type=text] as the activeElement with the keyboard", function() {
+    describe("focusing elements with the keyboard", function() {
+
+        var previousActiveElement;
 
         before(function() {
-            init('<p><label>Text: <input type="text" value="booooooob" /></label></p>');
-            elt.firstChild.firstChild.lastChild.focus();
-            regEventListener(elt.firstChild.firstChild.lastChild, 'mousedown');
+            init(
+                '<p>'
+              + '<label>Text: <input type="text" value="text" /></label>'
+              + '<label>Number: <input type="number" value="1664" /></label>'
+              + '<label>Textarea: <textarea>Plop</textarea</label>'
+              + '<label>Date: <input type="date" value="" /></label>'
+              + '<label>Link: <a href="#">Link</a></label>'
+              + '<label>Button: <button label="Button"/></label>'
+              + '<label>Submit: <input type="submit" value="submit" /></label>'
+              + '</p>'
+            );
+            regEventListener(document, 'keydown');
+            regEventListener(document, 'keyup');
+            regEventListener(elt.firstChild.firstChild.lastChild, 'blur');
+            regEventListener(elt.firstChild.firstChild.lastChild, 'focus');
         });
 
         after(uninit);
 
         it("should return true", function() {
-          assert.equal(mouse.select(elt.firstChild.firstChild.lastChild, 1, 8), true);
+          previousActiveElement = document.activeElement;
+          regEventListener(previousActiveElement, 'blur');
+          regEventListener(previousActiveElement, 'focus');
+          assert.equal(keyboard.focus(elt.firstChild.firstChild.lastChild), true);
         });
 
-        it("should not change it's value", function() {
-          assert.equal(elt.firstChild.firstChild.lastChild.value,'booooooob');
+        it("should set the element as the active element", function() {
+          assert.equal(elt.firstChild.firstChild.lastChild, document.activeElement);
         });
 
-        it("set the selection start correctly", function() {
-          assert.equal(elt.firstChild.firstChild.lastChild.selectionStart, 1);
+        it("should trigger a keydown event on the previousActiveElement", function() {
+            assert.equal(evts[0].type, 'keydown');
+            assert.equal(evts[0].target, previousActiveElement);
+            // Seems impossible to change charCode prop with phantom
+            if(!navigator.userAgent.match(/phantom/i)) {
+              assert.equal(evts[0].charCode, keyboard.TAB);
+            }
         });
 
-        it("set the selection end correctly", function() {
-          assert.equal(elt.firstChild.firstChild.lastChild.selectionEnd, 8);
+        it("should trigger a blur event on the previousActiveElement", function() {
+            assert.equal(evts[1].type, 'blur');
+            assert.equal(evts[1].target, previousActiveElement);
+            // Sadly, it seems impossible to set relatedTarget while using
+            // the focus/blur methods. Maybe do a select() and fire focus evts
+            // manually could do the job ?
+            // assert.equal(evts[1].relatedTarget, elt.firstChild.firstChild.lastChild);
+        });
+
+        it("should trigger a focus event on the newly activeElement", function() {
+            assert.equal(evts[2].type, 'focus');
+            assert.equal(evts[2].target, elt.firstChild.firstChild.lastChild);
+            // Sadly, it seems impossible to set relatedTarget while using
+            // the focus/blur methods. Maybe do a select() and fire focus evts
+            // manually could do the job ?
+            // assert.equal(evts[2].relatedTarget, previousActiveElement);
+        });
+
+        it("should trigger a keyup event on the newlyActiveElement", function() {
+            assert.equal(evts[3].type, 'keyup');
+            assert.equal(evts[3].target, elt.firstChild.firstChild.lastChild);
+            // Seems impossible to change charCode prop with phantom
+            if(!navigator.userAgent.match(/phantom/i)) {
+              assert.equal(evts[3].charCode, keyboard.TAB);
+            }
         });
 
     });
