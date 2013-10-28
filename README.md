@@ -22,8 +22,32 @@ mouse.move(x, y);  // Returns true if dispatched
 mouse.moveTo(element); // Returns true if dispatched
 // Clicking
 mouse.click(); // Returns true if dispatched
+// Right-clicking
+mouse.rightclick(); // Returns true if dispatched
 // Double-clicking
 mouse.dblclick(); // Returns true if dispatched
+// Pasting with the mouse
+mouse.paste(inputElement, 'content');
+// Cutting with the mouse
+mouse.cut(inputElement); // Returns the cutted content
+```
+
+#### Keyboard
+```js
+var kbd = effroi.keyboard;
+// Tabbing with the keyboard
+kbd.tab(); // Returns true if dispatched
+// Focusing an element
+kbd.focus(element); // Returns true if focus changed
+// Hitting a key
+kbd.hit('a'); // Returns true if dispatched
+kbd.hit('b','c','d'); // Returns true if dispatched
+// Combining keys
+kbd.combine(this.CTRL, 'c'); // Returns true if dispatched
+// Pasting with the keyboard
+kbd.paste('content');
+// Cutting with the keyboard
+kbd.cut(); // Returns the cutted content
 ```
 
 #### Tactile
@@ -34,12 +58,7 @@ tactile.scroll(x, y); // Returns true if scrolled false otherwise
 tactile.scrollTo(element); // Returns true if scrolled
 // Performing a touch
 tactile.touch(); // Returns true if dispatched
-// Double-touching
-tactile.dbltouch(); // Returns true if dispatched
 ```
-
-#### Keyboard
-Under development.
 
 #### Unified pointing device API (PointerEvents)
 Under development.
