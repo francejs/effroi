@@ -160,19 +160,11 @@ function Keyboard() {
     'End': 35,
     'Home': 36
   };
-
-  this.MODIFIERS = {};
-  this.MODIFIERS[this.ALT] = 'Alt';
-  // this.MODIFIERS[this.ALT_GR] = 'AltGraph'; not supported
-  this.MODIFIERS[this.CAPS_LOCK] = 'CapsLock';
-  this.MODIFIERS[this.CTRL] = 'Control';
-  // this.MODIFIERS[this.FN] = 'Fn'; not supported
-  // this.MODIFIERS[this.META] = 'Meta'; not supported
-  this.MODIFIERS[this.NUM_LOCK] = 'NumLock';
-  // this.MODIFIERS[this.SCROLL_LOCK] = 'ScrollLock',  // Can be "Scroll" on IE9 not supported
-  this.MODIFIERS[this.SHIFT] = 'Shift',
-  // this.MODIFIERS[this.SYM_LOCK] = 'SymbolLock', not supported
-  this.MODIFIERS[this.OS] = 'OS' // Can be "Win" on IE9
+  // Modifiers (legacy) http://www.w3.org/TR/DOM-Level-3-Events/#keys-Modifiers
+  this.MODIFIERS = [this.ALT, this.ALT_GR, this.CAPS_LOCK, this.CTRL, this.FN,
+    this.META, this.NUM_LOCK, this.SCROLL_LOCK, this.SHIFT, this.SYM_LOCK,
+    this.OS
+  ];
 
   // Private vars
   var _downKeys = [], _keyDownDispatched = [], _that=this;
@@ -212,8 +204,8 @@ function Keyboard() {
     var modifiers = '';
 	  if(_downKeys.length) {
 	    for(var i=_downKeys.length-1; i>=0; i--) {
-	      if(_that.MODIFIERS[_downKeys[i]]) {
-	        modifiers += (modifiers ? ' ' : '') + _that.MODIFIERS[_downKeys[i]];
+	      if(-1 !== _that.MODIFIERS.indexOf(_downKeys[i])) {
+	        modifiers += (modifiers ? ' ' : '') + _downKeys[i];
 	      }
 	    }
 	  }
