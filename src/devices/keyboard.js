@@ -10,12 +10,12 @@ function Keyboard() {
   // Maps for key / char properties
   // http://www.w3.org/TR/DOM-Level-3-Events/#key-values-list
   this.KEY_TO_CHAR = {
-  	'Cancel': '\u0018',
-  	'Esc': '\u001B',
-  	'Spacebar': '\u0020',
-  	'Add': '\u002B',
-  	'Subtract': '\u2212',
-  	'Multiply': '\u002A', // alternative '\u00D7'
+    'Cancel': '\u0018',
+    'Esc': '\u001B',
+    'Spacebar': '\u0020',
+    'Add': '\u002B',
+    'Subtract': '\u2212',
+    'Multiply': '\u002A', // alternative '\u00D7'
     'Divide': '\u00F7',
     'Equals': '\u003D',
     'Decimal': '\u2396', // alternatives '\u002E' or '\u00B7'
@@ -40,13 +40,13 @@ function Keyboard() {
     'DeadSemivoicedSound': '\u309A'
   };
   this.CHAR_TO_KEY = {
-  	'\u0018': 'Cancel',
-  	'\u001B': 'Esc',
-  	'\u0020': 'Spacebar',
-  	'\u002B': 'Add',
-  	'\u2212': 'Subtract',
-  	'\u002A': 'Multiply',
-  	'\u00D7': 'Multiply',
+    '\u0018': 'Cancel',
+    '\u001B': 'Esc',
+    '\u0020': 'Spacebar',
+    '\u002B': 'Add',
+    '\u2212': 'Subtract',
+    '\u002A': 'Multiply',
+    '\u00D7': 'Multiply',
     '\u00F7': 'Divide',
     '\u003D': 'Equals',
     '\u2396': 'Decimal',
@@ -189,27 +189,27 @@ function Keyboard() {
 
   // Try to add the char corresponding to the key to the activeElement
   function _inputChar(char) {
-	  if(_charIsPrintable(char.charCodeAt(0))
-	    &&utils.isSelectable(document.activeElement)) {
-	    // add the char
-	    // FIXME: put at caretPosition/replace selected content
-		  document.activeElement.value += char;
-		  // fire an input event
-		  utils.dispatch(document.activeElement, {type: 'input'});
-	  }
+    if(_charIsPrintable(char.charCodeAt(0))
+      &&utils.isSelectable(document.activeElement)) {
+      // add the char
+      // FIXME: put at caretPosition/replace selected content
+      document.activeElement.value += char;
+      // fire an input event
+      utils.dispatch(document.activeElement, {type: 'input'});
+    }
   }
 
   // Compute current modifiers
   function _getModifiers() {
     var modifiers = '';
-	  if(_downKeys.length) {
-	    for(var i=_downKeys.length-1; i>=0; i--) {
-	      if(-1 !== _that.MODIFIERS.indexOf(_downKeys[i])) {
-	        modifiers += (modifiers ? ' ' : '') + _downKeys[i];
-	      }
-	    }
-	  }
-	  return modifiers;
+    if(_downKeys.length) {
+      for(var i=_downKeys.length-1; i>=0; i--) {
+        if(-1 !== _that.MODIFIERS.indexOf(_downKeys[i])) {
+          modifiers += (modifiers ? ' ' : '') + _downKeys[i];
+        }
+      }
+    }
+    return modifiers;
   }
 
   /**
@@ -340,16 +340,16 @@ function Keyboard() {
   * @param  ArgumentList   arguments   Keycodes of the keys
   * @return Boolean
   */
-	this.combine = function () {
-		var dispatched;
-		if(0 === arguments.length) {
-		  throw Error('The combine method wait at least one key.');
-		}
+  this.combine = function () {
+    var dispatched;
+    if(0 === arguments.length) {
+      throw Error('The combine method wait at least one key.');
+    }
     // Pushing the keys sequentially
-		dispatched = this.down.apply(this, arguments);
+    dispatched = this.down.apply(this, arguments);
     // Releasing the keys sequentially
-		return this.up.apply(this, arguments) && dispatched;
-	};
+    return this.up.apply(this, arguments) && dispatched;
+  };
 
   /**
   * Hit somes keys sequentially.
@@ -357,20 +357,20 @@ function Keyboard() {
   * @param  ArgumentList   arguments   Keycodes of the keys
   * @return Boolean
   */
-	this.hit = function () {
-		var dispatched = true;
-		if(0 === arguments.length) {
-		  throw Error('The hit method wait at least one key.');
-		}
+  this.hit = function () {
+    var dispatched = true;
+    if(0 === arguments.length) {
+      throw Error('The hit method wait at least one key.');
+    }
     // Hitting the keys sequentially
     for(var i=0, j=arguments.length; i<j; i++) {
       // Push the key
-		  dispatched = this.down(arguments[i]) && dispatched;
+      dispatched = this.down(arguments[i]) && dispatched;
       // Release the key
-		  dispatched = this.up(arguments[i]) && dispatched;
-		}
-		return dispatched;
-	};
+      dispatched = this.up(arguments[i]) && dispatched;
+    }
+    return dispatched;
+  };
 
   /**
   * Release somes keys of the keyboard.
@@ -381,9 +381,9 @@ function Keyboard() {
 
   this.up = function () {
     var dispatched = true, keyIndex;
-		if(0 === arguments.length) {
-		  throw Error('The up method wait at least one key.');
-		}
+    if(0 === arguments.length) {
+      throw Error('The up method wait at least one key.');
+    }
     // Releasing the keys sequentially
     for(i=0, j=arguments.length; i<j; i++) {
       // get the platform specific key
@@ -392,13 +392,13 @@ function Keyboard() {
       if(-1 === keyIndex) {
         throw Error('Can\'t release a key that is not down ('+arguments[i]+')');
       }
-  		// unregister the key
-  		_downKeys.splice(keyIndex, 1);
+      // unregister the key
+      _downKeys.splice(keyIndex, 1);
       // dispatch the keyup event
-  		dispatched = this.dispatch(document.activeElement, {
-  		    type: 'keyup',
-  		    key: arguments[i]
-  		  }) && dispatched;
+      dispatched = this.dispatch(document.activeElement, {
+          type: 'keyup',
+          key: arguments[i]
+        }) && dispatched;
     }
     return dispatched;
   }
@@ -411,9 +411,9 @@ function Keyboard() {
   */
   this.down = function () {
     var dispatched = true;
-		if(0 === arguments.length) {
-		  throw Error('The down method wait at least one key.');
-		}
+    if(0 === arguments.length) {
+      throw Error('The down method wait at least one key.');
+    }
     // Pushing the keys sequentially
     for(i=0, j=arguments.length; i<j; i++) {
       dispatched = true;
@@ -423,23 +423,23 @@ function Keyboard() {
         throw Error('Can\'t push a key already down ('+arguments[i]+')');
       }
       // register the newly down key
-  		_downKeys.push(arguments[i]);
+      _downKeys.push(arguments[i]);
       // dispatch the keydown event
-  		dispatched = this.dispatch(document.activeElement, {
-  		    type: 'keydown',
-  		    key: arguments[i]
-  		  }) && dispatched;
+      dispatched = this.dispatch(document.activeElement, {
+          type: 'keydown',
+          key: arguments[i]
+        }) && dispatched;
       // dispatch the keypress event if the keydown has been dispatched
       // and the CTRL key is not pressed
       if(dispatched&&-1 === _downKeys.indexOf(this.CTRL)) {
         dispatched = this.dispatch(document.activeElement, {
-  		    type: 'keypress',
-  		    key: arguments[i]
-  		  });
-  		  // if keypress has been dispatched, try to input the char
-  		  if(dispatched) {
-    		  _inputChar(arguments[i]);
-  		  }
+          type: 'keypress',
+          key: arguments[i]
+        });
+        // if keypress has been dispatched, try to input the char
+        if(dispatched) {
+          _inputChar(arguments[i]);
+        }
       }
     }
     return dispatched;
@@ -452,26 +452,26 @@ function Keyboard() {
   * @param  Object      options   Event options
   * @return Boolean
   */
-	this.dispatch = function (element, options) {
-		var event, char, modifiers = _getModifiers(), location = 0;
-		options=options || {};
+  this.dispatch = function (element, options) {
+    var event, char, modifiers = _getModifiers(), location = 0;
+    options=options || {};
     options.canBubble = ('false' === options.canBubble ? false : true);
     options.cancelable = ('false' === options.cancelable ? false : true);
     options.view = options.view || window;
-		options.key = options.key || 'Unidentified';
-		options.repeat = !!options.repeat;
-		if('string' !== typeof options.key) {
-		  throw Error('The key option must be a string.');
-		}
-		if(-1 !== this.KEYS.indexOf(options.key)) {
-  		char = this.KEY_TO_CHAR[options.key] || '';
-		} else if(1 === options.key.length) {
-		  char = options.key;
-		} else {
-		  throw Error('Unknown key value "'+key+'".')
-		}
-		charCode = char ? char.charCodeAt(0) : 0;
-		keyCode = this.KEY_TO_CHARCODE[options.key] || charCode;
+    options.key = options.key || 'Unidentified';
+    options.repeat = !!options.repeat;
+    if('string' !== typeof options.key) {
+      throw Error('The key option must be a string.');
+    }
+    if(-1 !== this.KEYS.indexOf(options.key)) {
+      char = this.KEY_TO_CHAR[options.key] || '';
+    } else if(1 === options.key.length) {
+      char = options.key;
+    } else {
+      throw Error('Unknown key value "'+key+'".')
+    }
+    charCode = char ? char.charCodeAt(0) : 0;
+    keyCode = this.KEY_TO_CHARCODE[options.key] || charCode;
     // try to use the constructor (recommended with DOM level 3)
     // http://www.w3.org/TR/DOM-Level-3-Events/#new-event-interface-initializers
     try {
@@ -480,42 +480,42 @@ function Keyboard() {
         cancelable: options.cancelable,
         view: options.view,
         char: char,
-			  location: options.location,
-			  modifiers: modifiers,
+        location: options.location,
+        modifiers: modifiers,
         ctrlKey: -1 !== _downKeys.indexOf(this.CTRL),
         shiftKey: -1 !== _downKeys.indexOf(this.SHIFT),
         altKey: -1 !== _downKeys.indexOf(this.ALT),
         metaKey: -1 !== _downKeys.indexOf(this.META),
-			  repeat: options.repeat,
-			  locale: this.locale,
+        repeat: options.repeat,
+        locale: this.locale,
         // legacy
         charCode: charCode,
         which: keyCode,
         keyCode: keyCode
-			});
-			// Chrome seems to not set those properties properly
+      });
+      // Chrome seems to not set those properties properly
       utils.setEventProperty(event, 'char', char);
       utils.setEventProperty(event, 'charCode', charCode);
       utils.setEventProperty(event, 'keyCode', keyCode);
-  	  return element.dispatchEvent(event);
+      return element.dispatchEvent(event);
     } catch(e) {
-		  if(document.createEvent) {
-			  event = document.createEvent('KeyboardEvent');
-			  if(typeof event.initKeyboardEvent !== 'undefined') {
-				  event.initKeyboardEvent(options.type,
-				    options.canBubble, options.cancelable,
-				    options.view || window, char, options.charCode,
-				    options.location, modifiers,
-				    options.repeat, this.locale);
-			  } else {
-			    event.initKeyEvent(options.type,
-				  'false' === options.canBubble ? false : true,
-				  'false' === options.cancelable ? false : true,
-				  options.view||window,
+      if(document.createEvent) {
+        event = document.createEvent('KeyboardEvent');
+        if(typeof event.initKeyboardEvent !== 'undefined') {
+          event.initKeyboardEvent(options.type,
+            options.canBubble, options.cancelable,
+            options.view || window, char, options.charCode,
+            options.location, modifiers,
+            options.repeat, this.locale);
+        } else {
+          event.initKeyEvent(options.type,
+          'false' === options.canBubble ? false : true,
+          'false' === options.cancelable ? false : true,
+          options.view||window,
           -1 !== _downKeys.indexOf(this.CTRL), -1 !== _downKeys.indexOf(this.ALT),
           -1 !== _downKeys.indexOf(this.SHIFT), -1 !== _downKeys.indexOf(this.META),
           keyCode, charCode);
-			  }
+        }
         utils.setEventProperty(event, 'ctrlKey',
           -1 !== _downKeys.indexOf(this.CTRL));
         utils.setEventProperty(event, 'altKey',
@@ -528,21 +528,21 @@ function Keyboard() {
         utils.setEventProperty(event, 'which', keyCode);
         utils.setEventProperty(event, 'charCode', charCode);
         utils.setEventProperty(event, 'char', char);
-			  return element.dispatchEvent(event);
-		  } else if(document.createEventObject) {
-			  event = document.createEventObject();
-			  event.eventType = options.type;
+        return element.dispatchEvent(event);
+      } else if(document.createEventObject) {
+        event = document.createEventObject();
+        event.eventType = options.type;
         event.altKey = -1 !== _downKeys.indexOf(this.ALT);
         event.ctrlKey = -1 !== _downKeys.indexOf(this.CTRL);
         event.shiftKey = -1 !== _downKeys.indexOf(this.SHIFT);
         event.metaKey = -1 !== _downKeys.indexOf(this.META);
-			  event.keyCode = keyCode;
-			  event.charCode = charCode;
-			  event.char=char;
+        event.keyCode = keyCode;
+        event.charCode = charCode;
+        event.char=char;
         return element.fireEvent('on'+options.type, event);
-		  }
-		}
-	}
+      }
+    }
+  }
 
 }
 
