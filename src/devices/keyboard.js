@@ -136,7 +136,7 @@ function Keyboard() {
   this.SYM_LOCK = 'SymbolLock';
   this.ALT_GR = 'AltGraph';
   this.OS = 'OS';
-  // Legacy map
+  // Legacy map: http://www.w3.org/TR/DOM-Level-3-Events/#fixed-virtual-key-codes
   this.KEY_TO_CHARCODE = {
     'Up': '38',
     'Down': '40',
@@ -152,7 +152,13 @@ function Keyboard() {
     'Caps': 20,
     'NumLock': 144,
     'Shift': 16,
-    'OS': 91
+    'OS': 91,
+    'Alt': 18,
+    'CapsLock': 20,
+    'PageUp': 33,
+    'PageDown': 34,
+    'End': 35,
+    'Home': 36
   };
 
   this.MODIFIERS = {};
