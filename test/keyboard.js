@@ -73,11 +73,15 @@ describe("Keyboard device", function() {
         after(uninit);
 
         it("should return true", function() {
-            assert.equal(keyboard.hit('a'.charCodeAt(0)), true);
+            assert.equal(keyboard.hit('a'), true);
         });
 
         it("should set the char and charcode property", function() {
             assert.equal(evts[0].char, 'a');
+            // Seems impossible to change charCode prop with phantom
+            if(!navigator.userAgent.match(/phantom/i)) {
+              assert.equal(evts[0].charCode, 'a'.charCodeAt(0));
+            }
         });
 
         it("should set the view property to window", function() {
@@ -125,7 +129,7 @@ describe("Keyboard device", function() {
         after(uninit);
 
         it("should return true", function() {
-            assert.equal(keyboard.hit('a'.charCodeAt(0)), true);
+            assert.equal(keyboard.hit('a'), true);
         });
 
         it("should set the char property correctly", function() {
@@ -198,8 +202,7 @@ describe("Keyboard device", function() {
         after(uninit);
 
         it("should return true", function() {
-            assert.equal(keyboard.combine(keyboard.CTRL,
-              'c'.charCodeAt(0)), true);
+            assert.equal(keyboard.combine(keyboard.CTRL, 'c'), true);
         });
 
         it("should set an empty char property for the CTRL keydown event", function() {
@@ -374,7 +377,8 @@ describe("Keyboard device", function() {
             assert.equal(evts[0].target, previousActiveElement);
             // Seems impossible to change charCode prop with phantom
             if(!navigator.userAgent.match(/phantom/i)) {
-              assert.equal(evts[0].charCode, keyboard.TAB);
+              assert.equal(evts[0].charCode,
+                keyboard.KEY_TO_CHARCODE[keyboard.TAB]);
             }
         });
 
@@ -401,7 +405,8 @@ describe("Keyboard device", function() {
             assert.equal(evts[3].target, elt.firstChild.firstChild.lastChild);
             // Seems impossible to change charCode prop with phantom
             if(!navigator.userAgent.match(/phantom/i)) {
-              assert.equal(evts[3].charCode, keyboard.TAB);
+              assert.equal(evts[3].charCode,
+                keyboard.KEY_TO_CHARCODE[keyboard.TAB]);
             }
         });
 
