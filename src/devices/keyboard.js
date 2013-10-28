@@ -138,16 +138,16 @@ function Keyboard() {
   this.OS = 'OS';
   // Legacy map: http://www.w3.org/TR/DOM-Level-3-Events/#fixed-virtual-key-codes
   this.KEY_TO_CHARCODE = {
-    'Up': '38',
-    'Down': '40',
-    'Left': '37',
-    'Right': '39',
-    'Esc': '27',
-    'Spacebar': '32',
-    'Backspace': '8',
-    'Tab': '9',
-    'Del': '46',
-    'Enter': '13',
+    'Up': 38,
+    'Down': 40,
+    'Left': 37,
+    'Right': 39,
+    'Esc': 27,
+    'Spacebar': 32,
+    'Backspace': 8,
+    'Tab': 9,
+    'Del': 46,
+    'Enter': 13,
     'Control': 17,
     'Caps': 20,
     'NumLock': 144,
@@ -227,7 +227,7 @@ function Keyboard() {
     // Performing a first tab
     this.tab();
     activeElement = document.activeElement;
-    while(activeElement != element && this.tab()
+    while(element != document.activeElement && this.tab()
       && activeElement != document.activeElement) {
       continue;
     }
@@ -437,7 +437,7 @@ function Keyboard() {
           key: arguments[i]
         });
         // if keypress has been dispatched, try to input the char
-        if(dispatched) {
+        if(dispatched && 1 === arguments[i].length) {
           _inputChar(arguments[i]);
         }
       }
