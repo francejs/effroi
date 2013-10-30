@@ -2,7 +2,24 @@
 
 [![Build Status](https://travis-ci.org/francejs/effroi.png?branch=master)](https://travis-ci.org/francejs/effroi)
 
-An event-simulation library for JavaScript testing.
+A JavaScript event-simulation, device oriented library for UI testing.
+
+## Device oriented ?
+
+Effroi try to be the closest possible of the way your users use their input
+ devices. To achieve this goal, effroi emulate real physical devices and fires
+ every events a real device would fire for the same action.
+
+By example, when a user want to click an element the following events sequence
+ are fired:
+- several mousewheel events to scroll to the element (if needed)
+- several mouseout/mousemove/mouseover events to go over the element (if needed)
+- mousedown/mouseup events
+- a click event if none of the 2 previous events have been prevented
+
+That's typically what effroi emulate for your UI tests. Effroi will also check
+ for the feasibility of the requested action. If you try to click an element
+ that is nor visible nor clickable, effroi will throw an error.
 
 ## How to use
 
@@ -21,11 +38,11 @@ mouse.scrollTo(element); // Returns true if scrolled
 mouse.move(x, y);  // Returns true if dispatched
 mouse.moveTo(element); // Returns true if dispatched
 // Clicking
-mouse.click(); // Returns true if dispatched
+mouse.click(element); // Returns true if dispatched
 // Right-clicking
-mouse.rightclick(); // Returns true if dispatched
+mouse.rightclick(element); // Returns true if dispatched
 // Double-clicking
-mouse.dblclick(); // Returns true if dispatched
+mouse.dblclick(element); // Returns true if dispatched
 // Pasting with the mouse
 mouse.paste(inputElement, 'content');
 // Cutting with the mouse
