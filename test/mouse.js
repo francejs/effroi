@@ -623,14 +623,14 @@ describe("Mouse device", function() {
           assert.equal(evts[0].currentTarget, elt.lastChild.firstChild);
         });
 
-        it("should trigger a mouseout event on the focused element", function() {
-          assert.equal(evts[1].type, 'mouseout');
+        it("should trigger a focus event on the focused element", function() {
+          assert.equal(evts[1].type, 'focus');
           assert.equal(evts[1].target, elt.lastChild.firstChild);
           assert.equal(evts[1].currentTarget, elt.lastChild.firstChild);
         });
 
-        it("should trigger a focus event on the focused element", function() {
-          assert.equal(evts[2].type, 'focus');
+        it("should trigger a mouseout event on the focused element", function() {
+          assert.equal(evts[2].type, 'mouseout');
           assert.equal(evts[2].target, elt.lastChild.firstChild);
           assert.equal(evts[2].currentTarget, elt.lastChild.firstChild);
         });

@@ -92,40 +92,6 @@ module.exports={
       + 'select:not(:disabled)');
   },
 
-  // focus an element an fire blur/focus events if not done automagically
-  focus: function(element, options) {
-    var dispatched, eventFired = false, activeElement = document.activeElement,
-      that=this;
-    options = options || {};
-    // Focus events can't bubble
-    options.canBubble = false;
-    options.cancelable = false;
-    if(activeElement) {
-      options.type = 'blur'
-      options.relatedTarget = element;
-      activeElement.addEventListener(options.type, function blurListener(evt) {
-        eventFired = true;
-        activeElement.removeEventListener(options.type, blurListener);
-      });
-      activeElement.blur();
-      if(!eventFired) {
-        this.dispatchFocusEvent('blur', activeElement, element);
-      }
-      eventFired = false;
-    }
-    options.type = 'focus';
-    element.addEventListener(options.type, function focusListener(evt) {
-      eventFired = true;
-      dispatched = !evt.defaultPrevented;
-      element.removeEventListener(options.type, focusListener, true);
-    });
-    element.focus();
-    if(!eventFired) {
-      dispatched = this.dispatchFocusEvent('focus', element, activeElement);
-    }
-    return dispatched;
-  },
-
   // dispatch a simple event
   dispatch: function(element, options) {
     var event;
@@ -134,65 +100,27 @@ module.exports={
     options.cancelable = ('false' === options.cancelable ? false : true);
     options.view = options.view || window;
     try {
-      event = document.createEvent("Event");
-      event.initEvent(options.type,
-        options.canBubble, options.cancelable);
-      this.setEventProperty(event, 'relatedTarget', options.relatedTarget);
-      return element.dispatchEvent(event);
-    } catch(e) {
-      // old IE fallback
-      event = document.createEventObject();
-      event.eventType = options.type;
-      event.relatedTarget = options.relatedTarget;
-      return element.fireEvent('on'+options.type, event)
-    }
-  },
-
-  // dispatch a focus event http://www.w3.org/TR/DOM-Level-3-Events/#events-focusevent
-  dispatchFocusEvent: function(type, target, relatedTarget) {
-    var event, canBubble, cancelable;
-    if('focusin' === type || 'focusout' === type) {
-      canBubble = cancelable = true;
-    } else if('blur' === type || 'focus' === type) {
-      canBubble = cancelable = false;
-    } else {
-      throw Error('Unknow focus event type "' + type + '".');
-    }
-    try {
-      // First try to use the constructor
-      try {
-        var event = new FocusEvent(type, {
-          bubbles: canBubble,
-          cancelable: cancelable,
-          view: window,
-          detail: 0,
-          relatedTarget: relatedTarget
+        event = new Event(options.type, {
+          bubbles: options.canBubble,
+          cancelable: options.cancelable,
+          view: options.view,
+          relatedTarget: options.relatedTarget
         });
-      } catch(e) {
-        // the standard interface is FocusEvent, but not always provided
-        if('FocusEvent' in window) {
-          event = document.createEvent("FocusEvent");
-        } else {
-          event = document.createEvent("Event");
-        }
-        // IE9+ provides a initFocusEvent method
-        // http://msdn.microsoft.com/en-us/library/ie/ff974341(v=vs.85).aspx
-        if('initFocusEvent' in event) {
-          event.initFocusEvent(type, canBubble, cancelable, window, 0,
-            relatedTarget);
-        } else {
-          event.initEvent(type, canBubble, cancelable);
-          this.setEventProperty(event, 'relatedTarget', relatedTarget);
-        }
-        
-      }
-      return target.dispatchEvent(event);
+        return element.dispatchEvent(event);
     } catch(e) {
-      // old IE fallback
-      event = document.createEventObject();
-      event.eventType = type;
-      event.relatedTarget = relatedTarget;
-      return target.fireEvent('on'+type, event)
+      try {
+        event = document.createEvent("Event");
+        event.initEvent(options.type,
+          options.canBubble, options.cancelable);
+        this.setEventProperty(event, 'relatedTarget', options.relatedTarget);
+        return element.dispatchEvent(event);
+      } catch(e) {
+        // old IE fallback
+        event = document.createEventObject();
+        event.eventType = options.type;
+        event.relatedTarget = options.relatedTarget;
+        return element.fireEvent('on'+options.type, event)
+      }
     }
   }
 

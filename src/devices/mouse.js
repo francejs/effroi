@@ -1,6 +1,7 @@
 function Mouse() {
 
   var utils = require('../utils.js');
+  var uiFocus = require('../ui/focus.js');
 
   // Consts
   this.LEFT_BUTTON = 1;
@@ -209,10 +210,12 @@ function Mouse() {
     dispatched=this.dispatch(element, options);
     // Here, maybe find the first parent element having greater bound rect
     // and move on it's focusable zone or fail if none available
+    if(dispatched) {
+      uiFocus.focus(element);
+    }
     this.moveTo(element.parentNode);
     options.type = 'mouseup';
     this.dispatch(element.parentNode, options);
-    dispatched = utils.focus(element, options);
     return dispatched;
   };
 

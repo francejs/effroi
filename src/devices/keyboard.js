@@ -2,6 +2,7 @@ function Keyboard() {
 
   var utils = require('../utils.js');
   var mouse = require('./mouse.js');
+  var uiFocus = require('../ui/focus.js');
 
   // Configuration
   this.locale = ''; // ex: en-US
@@ -257,7 +258,7 @@ function Keyboard() {
     // Push the tab key down
     this.down(this.TAB);
     // Focus the next element
-    dispatched = utils.focus(-1 === i || i+1 >= elements.length ?
+    dispatched = uiFocus.focus(-1 === i || i+1 >= elements.length ?
       elements[0] : elements[i+1]);
     // Release the tab key
     this.up(this.TAB);
