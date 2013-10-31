@@ -3,7 +3,7 @@ function Focus() {
   var utils = require('../utils.js');
 
   // Private vars
-  var _focusedInputValue;
+  var _focusedInput, _focusedInputValue;
 
   // Consts
   this.EVENT_BLUR = 'blur';
@@ -35,26 +35,34 @@ function Focus() {
     // Registering listeners to check that events are fired
     function focusListener(evt) {
       focusEventFired = true;
-      element.removeEventListener(evt.type, focusListener, true);
+      element.removeEventListener(evt.type, focusListener);
     }
     element.addEventListener(this.EVENT_FOCUS, focusListener);
     function focusInListener(evt) {
       focusinEventFired = true;
-      element.removeEventListener(evt.type, focusInListener, true);
+      element.removeEventListener(evt.type, focusInListener);
     }
     element.addEventListener(this.EVENT_FOCUSIN, focusInListener);
     // Calling the focus method
     element.focus();
-   // Dispatch a focus event if not done before
+    // Saving value for inputs
+    if(utils.isValuable(element)) {
+      _focusedInputValue = (activeElement.value || activeElement.checked);
+      _focusedInput = element;
+    } else {
+      _focusedInputValue = undefined;
+      _focusedInput = null;
+    }
+    // Dispatch a focus event if not done before
     if(!focusEventFired) {
-      element.removeEventListener(this.EVENT_FOCUS, focusListener, true);
+      element.removeEventListener(this.EVENT_FOCUS, focusListener);
       options.type = this.EVENT_FOCUS;
       options.canBubble = false;
       this.dispatch(element, options);
     }
     // then dispatch a focusin event
     if(!focusinEventFired) {
-      element.removeEventListener(this.EVENT_FOCUSIN, focusInListener, true);
+      element.removeEventListener(this.EVENT_FOCUSIN, focusInListener);
       options.type = this.EVENT_FOCUSIN;
       options.canBubble = true;
       this.dispatch(element, options);
@@ -76,6 +84,14 @@ function Focus() {
     if(activeElement) {
       // Default options
       options = options || {};
+      // Fire change event if some changes
+      if(_focusedInput === activeElement
+        && _focusedInputValue !== (activeElement.value || activeElement.checked)) {
+        options.type = 'change';
+        options.canBubble = true;
+        options.cancelable = false;
+        utils.dispatch(activeElement, options);
+      }
       options.relatedTarget = options.relatedTarget || null;
       // Registering listeners to check that events are fired
       function blurListener(evt) {
@@ -160,7 +176,6 @@ function Focus() {
       }
       return element.dispatchEvent(event);
     } catch(e) {
-        throw e;
       // old IE fallback
       event = document.createEventObject();
       event.eventType = options.type;

@@ -399,17 +399,50 @@ describe("Keyboard device", function() {
             // manually could do the job ?
             // assert.equal(evts[2].relatedTarget, previousActiveElement);
         });
-/*
-        it("should trigger a keyup event on the newlyActiveElement", function() {
-            assert.equal(evts[3].type, 'keyup');
-            assert.equal(evts[3].target, elt.firstChild.firstChild.lastChild);
-            // Seems impossible to change charCode prop with phantom
-            if(!navigator.userAgent.match(/phantom/i)) {
-              assert.equal(evts[3].charCode,
-                keyboard.KEY_TO_CHARCODE[keyboard.TAB]);
-            }
+
+        // Firefox bug : https://bugzilla.mozilla.org/show_bug.cgi?id=932897
+        if(!navigator.userAgent.match(/firefox/i)) {
+          it("should trigger a keyup event on the newlyActiveElement", function() {
+              assert.equal(evts[3].type, 'keyup');
+              assert.equal(evts[3].target, elt.firstChild.firstChild.lastChild);
+              // Seems impossible to change charCode prop with phantom
+              if(!navigator.userAgent.match(/phantom/i)) {
+                assert.equal(evts[3].charCode,
+                  keyboard.KEY_TO_CHARCODE[keyboard.TAB]);
+              }
+          });
+        }
+
+    });
+
+    describe("focusing an input, editing and blur", function() {
+
+        before(function() {
+            init(
+                '<p>'
+              + '<label>Text: <input type="text" value="text1" name="text1" /></label>'
+              + '<label>Text: <input type="text" value="text2" name="text2" /></label>'
+              + '</p>'
+            );
         });
-*/
+
+        after(uninit);
+
+        it("should trigger a change event on the edited element", function() {
+            keyboard.focus(elt.firstChild.firstChild.lastChild);
+            regEventListener(elt.firstChild.firstChild.lastChild, 'change');
+            regEventListener(document.body, 'change');
+            keyboard.hit('h');
+            keyboard.tab();
+            assert.equal(evts[0].type, 'change');
+            assert.equal(evts[0].target, elt.firstChild.firstChild.lastChild);
+        });
+
+        it("should bubble the change event on the edited element parents", function() {
+            assert.equal(evts[1].type, 'change');
+            assert.equal(evts[1].target, elt.firstChild.firstChild.lastChild);
+        });
+
     });
 
 });

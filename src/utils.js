@@ -83,6 +83,22 @@ module.exports={
 		return false;
   },
 
+  // Tell if the element is a form element that can contain a value
+  isValuable: function(element) {
+    if('TEXTAREA'===element.nodeName || 'SELECT'===element.nodeName
+			|| ('INPUT'===element.nodeName&&element.hasAttribute('type')
+				&&('text'===element.getAttribute('type')
+			    || 'number'===element.getAttribute('type')
+			    || 'password'===element.getAttribute('type')
+			    || 'file'===element.getAttribute('type')
+			    || 'date'===element.getAttribute('type'))
+			)
+		) {
+		  return true;
+		}
+		return false;
+  },
+
   // Returns a list of focusable elements in the document
   getFocusableElements: function(element) {
     // FIXME: Ordinate elements with tabindexes + fallback for querySelector
