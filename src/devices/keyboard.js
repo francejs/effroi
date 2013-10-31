@@ -276,6 +276,7 @@ function Keyboard() {
     var content, element = document.activeElement;
     // if the keydown event is prevented we can't cut content
     if(!this.down(this.CTRL, 'x')) {
+      this.up(this.CTRL, 'x');
       return '';
     }
     // if content is selectable, we cut only the selected content
