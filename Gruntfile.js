@@ -29,7 +29,7 @@ module.exports = function(grunt) {
             }
         },
 
-         watch: {
+        watch: {
             code: {
                 files: ['src/**/*.js'],
                 tasks: ['dist']
@@ -44,7 +44,8 @@ module.exports = function(grunt) {
 
     grunt.registerTask('test', [
         'dist',
-        'karma:local'
+        'karma:local',
+        'watch'
     ]);
 
     grunt.registerTask('travis', [
