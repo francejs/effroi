@@ -47,7 +47,7 @@ function Focus() {
     element.focus();
     // Saving value for inputs
     if(utils.isValuable(element)) {
-      _focusedInputValue = (activeElement.value || activeElement.checked);
+      _focusedInputValue = (element.value || element.checked);
       _focusedInput = element;
     } else {
       _focusedInputValue = undefined;
@@ -85,7 +85,7 @@ function Focus() {
       // Default options
       options = options || {};
       // Fire change event if some changes
-      if(_focusedInput === activeElement
+      if(_focusedInput === activeElement && 'undefined' !== typeof _focusedInputValue
         && _focusedInputValue !== (activeElement.value || activeElement.checked)) {
         options.type = 'change';
         options.canBubble = true;
