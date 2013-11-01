@@ -43,8 +43,12 @@ module.exports = function(grunt) {
     ]);
 
     grunt.registerTask('test', [
+        'karma:local'
+    ]);
+
+    grunt.registerTask('default', [
+        'test',
         'dist',
-        'karma:local',
         'watch'
     ]);
 
