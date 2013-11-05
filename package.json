@@ -18,8 +18,8 @@
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-clean": "~0.5.0",
-    "browserify": "~2.33.1",
-    "grunt-browserify": "~1.2.8",
+    "browserify": "2.x.x",
+    "grunt-browserify": "1.2.x",
     "karma-script-launcher": "~0.1.0",
     "karma-chrome-launcher": "~0.1.0",
     "karma-firefox-launcher": "~0.1.0",
