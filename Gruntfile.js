@@ -1,9 +1,6 @@
 module.exports = function(grunt) {
 
-    grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-browserify');
-    grunt.loadNpmTasks('grunt-karma');
+    require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
     
     grunt.initConfig({
         clean: ['dist'],
@@ -34,6 +31,21 @@ module.exports = function(grunt) {
                 files: ['src/**/*.js'],
                 tasks: ['dist']
             }
+        },
+
+        parallel: {
+            testing: {
+                options: {
+                  stream: true
+                },
+                tasks: [{
+                  grunt: true,
+                  args: ['karma:local']
+                },{
+                  grunt: true,
+                  args: ['watch']
+                }]
+            }
         }
     });
 
@@ -43,13 +55,12 @@ module.exports = function(grunt) {
     ]);
 
     grunt.registerTask('test', [
-        'karma:local'
+        'dist',
+        'parallel:testing'
     ]);
 
     grunt.registerTask('default', [
-        'test',
-        'dist',
-        'watch'
+        'test'
     ]);
 
     grunt.registerTask('travis', [

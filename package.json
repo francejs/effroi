@@ -1,10 +1,10 @@
 {
   "name": "effroi",
   "version": "0.0.0",
-  "description": "",
-  "main": "Gruntfile.js",
+  "description": "UI testing library.",
+  "main": "dist/effroi.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "grunt test"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,7 @@
     "grunt-contrib-clean": "~0.5.0",
     "browserify": "~2.33.1",
     "grunt-browserify": "~1.2.8",
+    "grunt-parallel": "~0.3.1",
     "karma-script-launcher": "~0.1.0",
     "karma-chrome-launcher": "~0.1.0",
     "karma-firefox-launcher": "~0.1.0",
@@ -34,6 +35,14 @@
     "chai": "~1.8.1",
     "karma-mocha": "~0.1.0",
     "grunt-contrib-watch": "~0.5.3",
-    "sinon": "~1.7.3"
-  }
+    "sinon": "~1.7.3",
+    "matchdep": "~0.3.0"
+  },
+  "keywords": [
+    "effroi",
+    "ui",
+    "test",
+    "uitesting",
+    "event"
+  ]
 }
