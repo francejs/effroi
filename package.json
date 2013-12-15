@@ -2,6 +2,7 @@
   "name": "effroi",
   "version": "0.0.0",
   "description": "UI testing library.",
+  "author": "Raphaël Rougeron, Nicolas Froidure",
   "main": "dist/effroi.js",
   "scripts": {
     "test": "grunt test"
@@ -10,7 +11,6 @@
     "type": "git",
     "url": "git://github.com/francejs/effroi.git"
   },
-  "author": "Raphaël Rougeron, Nicolas Froidure",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/francejs/effroi/issues"

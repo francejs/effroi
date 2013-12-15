@@ -9,13 +9,6 @@ module.exports = function(grunt) {
           all: {
             src: ['Gruntfile.js', 'src/**/*.js'],
             options: {
-  /*            curly: true,
-              eqeqeq: true,
-              eqnull: true,
-              browser: true,
-              globals: {
-                jQuery: true
-              },*/
               '-W014': true
             }
           }

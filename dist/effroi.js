@@ -785,25 +785,35 @@ function Mouse() {
   */
   this.move = function move(x, y, options) {
     var curElement = document.elementFromPoint(_x, _y),
-      targetElement = document.elementFromPoint(x, y),
+      targetElement,
+      oldScrollX = window.scrollX,
+      oldScrollY = window.scrollY,
       dispatched;
+    // Could move the cursor of %n px and repeat mouseover/out events
+    // killer feature or overkill ?
+    options = options || {};
+    options.type = 'mouseout';
+    dispatched = this.dispatch(curElement, options);
     this.scroll(x, y, options);
+    _x = x + oldScrollX - window.scrollX;
+    _y = y + oldScrollY - window.scrollY;
+    if(_x < 0 || _y < 0) {
+      throw new Error('The mouse pointer coordinates can\'t be negative.');
+    }
+    if(_x >= window.innerWidth || _y >= window.innerHeight) {
+      throw new Error('The mouse pointer coordinates can\'t be greater than the'
+        +' viewport size.');
+    }
+    targetElement = document.elementFromPoint(_x, _y);
     if(!targetElement) {
       throw Error('Couldn\'t perform the move. Coordinnates seems invalid.');
     }
     if(curElement===targetElement) {
       return false;
     }
-    // Could move the cursor of %n px and repeat mouseover/out events
-    // killer feature or overkill ?
-    options = options || {};
-    options.type = 'mouseout';
-    options.relatedTarget = targetElement;
-    dispatched = this.dispatch(curElement, options);
     options.type = 'mouseover';
     options.relatedTarget = curElement;
     dispatched = this.dispatch(targetElement, options);
-    _x = x; _y = y;
     return true;
   };
 
@@ -816,6 +826,9 @@ function Mouse() {
   */
   this.moveTo = function moveTo(element, options) {
     var c = utils.getElementCenter(element);
+    // We are giving the related target to avoid calculating it later
+    options = options || {};
+    options.relatedTarget = element;
     return this.move(c.x, c.y, options);
   };
 
@@ -1658,6 +1671,9 @@ module.exports={
   // a pointer event (is not under another element)
   getPossiblePointerCoords: function(element) {
     var comp, rects, coords = null;
+    if(!(element instanceof HTMLElement)) {
+      throw new Error('getPossiblePointerCoords needs a valid HTMLElement.');
+    }
     comp = window.getComputedStyle(element, null);
     rects=element.getClientRects();
     if('none' !== comp.pointerEvents && rects.length) {

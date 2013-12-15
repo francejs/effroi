@@ -25,6 +25,9 @@ module.exports={
   // a pointer event (is not under another element)
   getPossiblePointerCoords: function(element) {
     var comp, rects, coords = null;
+    if(!(element instanceof HTMLElement)) {
+      throw new Error('getPossiblePointerCoords needs a valid HTMLElement.');
+    }
     comp = window.getComputedStyle(element, null);
     rects=element.getClientRects();
     if('none' !== comp.pointerEvents && rects.length) {

@@ -239,8 +239,16 @@ function Mouse() {
     options.type = 'mouseout';
     dispatched = this.dispatch(curElement, options);
     this.scroll(x, y, options);
-    targetElement = document.elementFromPoint(x + oldScrollX - window.scrollX,
-      y + oldScrollY - window.scrollY);
+    _x = x + oldScrollX - window.scrollX;
+    _y = y + oldScrollY - window.scrollY;
+    if(_x < 0 || _y < 0) {
+      throw new Error('The mouse pointer coordinates can\'t be negative.');
+    }
+    if(_x >= window.innerWidth || _y >= window.innerHeight) {
+      throw new Error('The mouse pointer coordinates can\'t be greater than the'
+        +' viewport size.');
+    }
+    targetElement = document.elementFromPoint(_x, _y);
     if(!targetElement) {
       throw Error('Couldn\'t perform the move. Coordinnates seems invalid.');
     }
@@ -250,7 +258,6 @@ function Mouse() {
     options.type = 'mouseover';
     options.relatedTarget = curElement;
     dispatched = this.dispatch(targetElement, options);
-    _x = x; _y = y;
     return true;
   };
 
