@@ -229,7 +229,8 @@ function Mouse() {
   */
   this.move = function move(x, y, options) {
     var curElement = document.elementFromPoint(_x, _y),
-      targetElement = document.elementFromPoint(x, y);
+      targetElement = document.elementFromPoint(x, y),
+      dispatched;
     this.scroll(x, y, options);
     if(!targetElement) {
       throw Error('Couldn\'t perform the move. Coordinnates seems invalid.')

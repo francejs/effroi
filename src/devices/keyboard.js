@@ -387,7 +387,7 @@ function Keyboard() {
       throw Error('The up method wait at least one key.');
     }
     // Releasing the keys sequentially
-    for(i=0, j=arguments.length; i<j; i++) {
+    for(var i=0, j=arguments.length; i<j; i++) {
       // get the platform specific key
       // check the key is down
       keyIndex = _downKeys.indexOf(arguments[i]);
@@ -417,7 +417,7 @@ function Keyboard() {
       throw Error('The down method wait at least one key.');
     }
     // Pushing the keys sequentially
-    for(i=0, j=arguments.length; i<j; i++) {
+    for(var i=0, j=arguments.length; i<j; i++) {
       dispatched = true;
       // get the platform specific key
       // check the key is down
@@ -455,7 +455,8 @@ function Keyboard() {
   * @return Boolean
   */
   this.dispatch = function (element, options) {
-    var event, char, modifiers = _getModifiers(), location = 0;
+    var event, char, charCode, keyCode,
+      modifiers = _getModifiers(), location = 0;
     options=options || {};
     options.canBubble = ('false' === options.canBubble ? false : true);
     options.cancelable = ('false' === options.cancelable ? false : true);
