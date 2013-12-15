@@ -1,5 +1,4 @@
-(function(e){if("function"==typeof bootstrap)bootstrap("effroi",e);else if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else if("undefined"!=typeof ses){if(!ses.ok())return;ses.makeEffroi=e}else"undefined"!=typeof window?window.effroi=e():global.effroi=e()})(function(){var define,ses,bootstrap,module,exports;
-return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+!function(e){"object"==typeof exports?module.exports=e():"function"==typeof define&&define.amd?define(e):"undefined"!=typeof window?window.effroi=e():"undefined"!=typeof global?global.effroi=e():"undefined"!=typeof self&&(self.effroi=e())}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 function Keyboard() {
 
   var utils = require('../utils.js');
@@ -405,7 +404,7 @@ function Keyboard() {
         }) && dispatched;
     }
     return dispatched;
-  }
+  };
 
   /**
   * Push somes keys of the keyboard.
@@ -447,7 +446,7 @@ function Keyboard() {
       }
     }
     return dispatched;
-  }
+  };
 
   /**
   * Dispatches a keyboard event to the given DOM element.
@@ -473,7 +472,7 @@ function Keyboard() {
     } else if(1 === options.key.length) {
       char = options.key;
     } else {
-      throw Error('Unknown key value "'+key+'".')
+      throw Error('Unknown key value "'+key+'".');
     }
     charCode = char ? char.charCodeAt(0) : 0;
     keyCode = this.KEY_TO_CHARCODE[options.key] || charCode;
@@ -547,7 +546,7 @@ function Keyboard() {
         return element.fireEvent('on'+options.type, event);
       }
     }
-  }
+  };
 
 }
 
@@ -790,7 +789,7 @@ function Mouse() {
       dispatched;
     this.scroll(x, y, options);
     if(!targetElement) {
-      throw Error('Couldn\'t perform the move. Coordinnates seems invalid.')
+      throw Error('Couldn\'t perform the move. Coordinnates seems invalid.');
     }
     if(curElement===targetElement) {
       return false;
@@ -908,7 +907,7 @@ function Mouse() {
     options.canBubble = ('false' === options.canBubble ? false : true);
     options.cancelable = ('false' === options.cancelable ? false : true);
     options.view = options.view || window;
-    options.detail = options.detail || 1,
+    options.detail = options.detail || 1;
     options.altKey = !!options.altKey;
     options.ctrlKey = !!options.ctrlKey;
     options.shiftKey = !!options.shiftKey;
@@ -966,7 +965,7 @@ function Mouse() {
     }
   };
 
-};
+}
 
 module.exports = new Mouse();
 
@@ -1220,7 +1219,7 @@ function Tactile() {
     dispatched = this.dispatch(document.elementFromPoint(moveX, moveY),
       options);
     // Moving through the x/y axis
-    while(dispatched && (scrollX != 0 || scrollY != 0)) {
+    while(dispatched && (scrollX !== 0 || scrollY !== 0)) {
       // repeat the move if the finger is about to go out of the screen
       if(moveX<10||moveY<10
         ||moveX>window.innerWidth-10
@@ -1296,7 +1295,7 @@ function Tactile() {
     options.canBubble = ('false' === options.canBubble ? false : true);
     options.cancelable = ('false' === options.cancelable ? false : true);
     options.view = options.view || window;
-    options.detail = options.detail || 1,
+    options.detail = options.detail || 1;
     options.altKey = !!options.altKey;
     options.ctrlKey = !!options.ctrlKey;
     options.shiftKey = !!options.shiftKey;
@@ -1371,16 +1370,17 @@ function Element(selector) {
 
     this.click = function click() {
         return mouse.click(this.element);
-    }
+    };
 
     this.dblclick = function dblclick() {
         return mouse.dblclick(this.element);
-    }
+    };
 }
 
 module.exports = function element(selector) {
     return new Element(selector);
 };
+
 },{"../devices/mouse.js":2}],6:[function(require,module,exports){
 function Input(elementOrSelector) {
     
@@ -1520,6 +1520,14 @@ function Focus() {
   * @return Boolean
   */
   this.blur = function blur(options) {
+    function blurListener(evt) {
+      blurEventFired = true;
+      activeElement.removeEventListener(evt.type, blurListener);
+    }
+    function focusoutListener(evt) {
+      focusoutEventFired = true;
+      activeElement.removeEventListener(evt.type, focusoutListener);
+    }
     var activeElement = document.activeElement,
       blurEventFired = false,
       focusoutEventFired = false;
@@ -1536,15 +1544,7 @@ function Focus() {
       }
       options.relatedTarget = options.relatedTarget || null;
       // Registering listeners to check that events are fired
-      function blurListener(evt) {
-        blurEventFired = true;
-        activeElement.removeEventListener(evt.type, blurListener);
-      }
       activeElement.addEventListener(this.EVENT_BLUR, blurListener);
-      function focusoutListener(evt) {
-        focusoutEventFired = true;
-        activeElement.removeEventListener(evt.type, focusoutListener);
-      }
       activeElement.addEventListener(this.EVENT_FOCUSOUT, focusoutListener);
       // Calling the blur method
       activeElement.blur();
@@ -1617,12 +1617,12 @@ function Focus() {
         
       }
       return element.dispatchEvent(event);
-    } catch(e) {
+    } catch(err) {
       // old IE fallback
       event = document.createEventObject();
       event.eventType = options.type;
       event.relatedTarget = options.relatedTarget;
-      return element.fireEvent('on'+type, event)
+      return element.fireEvent('on'+type, event);
     }
   };
 
@@ -1700,36 +1700,36 @@ module.exports={
       && ['text', 'password', 'number', 'date'].indexOf(type) !== -1) {
       return true;
     }
-		return false;
+    return false;
   },
 
   // Tell if the element content can be partially selected
   isSelectable: function(element) {
     if('TEXTAREA'===element.nodeName
-			||('INPUT'===element.nodeName&&element.hasAttribute('type')
-				&&('text'===element.getAttribute('type')
-			    ||'number'===element.getAttribute('type'))
-			)
-		) {
-		  return true;
-		}
-		return false;
+      ||('INPUT'===element.nodeName&&element.hasAttribute('type')
+        &&('text'===element.getAttribute('type')
+          ||'number'===element.getAttribute('type'))
+      )
+    ) {
+      return true;
+    }
+    return false;
   },
 
   // Tell if the element is a form element that can contain a value
   isValuable: function(element) {
     if('TEXTAREA'===element.nodeName || 'SELECT'===element.nodeName
-			|| ('INPUT'===element.nodeName&&element.hasAttribute('type')
-				&&('text'===element.getAttribute('type')
-			    || 'number'===element.getAttribute('type')
-			    || 'password'===element.getAttribute('type')
-			    || 'file'===element.getAttribute('type')
-			    || 'date'===element.getAttribute('type'))
-			)
-		) {
-		  return true;
-		}
-		return false;
+      || ('INPUT'===element.nodeName&&element.hasAttribute('type')
+        &&('text'===element.getAttribute('type')
+          || 'number'===element.getAttribute('type')
+          || 'password'===element.getAttribute('type')
+          || 'file'===element.getAttribute('type')
+          || 'date'===element.getAttribute('type'))
+      )
+    ) {
+      return true;
+    }
+    return false;
   },
 
   // Returns a list of focusable elements in the document
@@ -1763,12 +1763,12 @@ module.exports={
           options.canBubble, options.cancelable);
         this.setEventProperty(event, 'relatedTarget', options.relatedTarget);
         return element.dispatchEvent(event);
-      } catch(e) {
+      } catch(err) {
         // old IE fallback
         event = document.createEventObject();
         event.eventType = options.type;
         event.relatedTarget = options.relatedTarget;
-        return element.fireEvent('on'+options.type, event)
+        return element.fireEvent('on'+options.type, event);
       }
     }
   }

@@ -67,36 +67,36 @@ module.exports={
       && ['text', 'password', 'number', 'date'].indexOf(type) !== -1) {
       return true;
     }
-		return false;
+    return false;
   },
 
   // Tell if the element content can be partially selected
   isSelectable: function(element) {
     if('TEXTAREA'===element.nodeName
-			||('INPUT'===element.nodeName&&element.hasAttribute('type')
-				&&('text'===element.getAttribute('type')
-			    ||'number'===element.getAttribute('type'))
-			)
-		) {
-		  return true;
-		}
-		return false;
+      ||('INPUT'===element.nodeName&&element.hasAttribute('type')
+        &&('text'===element.getAttribute('type')
+          ||'number'===element.getAttribute('type'))
+      )
+    ) {
+      return true;
+    }
+    return false;
   },
 
   // Tell if the element is a form element that can contain a value
   isValuable: function(element) {
     if('TEXTAREA'===element.nodeName || 'SELECT'===element.nodeName
-			|| ('INPUT'===element.nodeName&&element.hasAttribute('type')
-				&&('text'===element.getAttribute('type')
-			    || 'number'===element.getAttribute('type')
-			    || 'password'===element.getAttribute('type')
-			    || 'file'===element.getAttribute('type')
-			    || 'date'===element.getAttribute('type'))
-			)
-		) {
-		  return true;
-		}
-		return false;
+      || ('INPUT'===element.nodeName&&element.hasAttribute('type')
+        &&('text'===element.getAttribute('type')
+          || 'number'===element.getAttribute('type')
+          || 'password'===element.getAttribute('type')
+          || 'file'===element.getAttribute('type')
+          || 'date'===element.getAttribute('type'))
+      )
+    ) {
+      return true;
+    }
+    return false;
   },
 
   // Returns a list of focusable elements in the document
@@ -130,12 +130,12 @@ module.exports={
           options.canBubble, options.cancelable);
         this.setEventProperty(event, 'relatedTarget', options.relatedTarget);
         return element.dispatchEvent(event);
-      } catch(e) {
+      } catch(err) {
         // old IE fallback
         event = document.createEventObject();
         event.eventType = options.type;
         event.relatedTarget = options.relatedTarget;
-        return element.fireEvent('on'+options.type, event)
+        return element.fireEvent('on'+options.type, event);
       }
     }
   }

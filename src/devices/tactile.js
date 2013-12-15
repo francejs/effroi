@@ -58,7 +58,7 @@ function Tactile() {
     dispatched = this.dispatch(document.elementFromPoint(moveX, moveY),
       options);
     // Moving through the x/y axis
-    while(dispatched && (scrollX != 0 || scrollY != 0)) {
+    while(dispatched && (scrollX !== 0 || scrollY !== 0)) {
       // repeat the move if the finger is about to go out of the screen
       if(moveX<10||moveY<10
         ||moveX>window.innerWidth-10
@@ -134,7 +134,7 @@ function Tactile() {
     options.canBubble = ('false' === options.canBubble ? false : true);
     options.cancelable = ('false' === options.cancelable ? false : true);
     options.view = options.view || window;
-    options.detail = options.detail || 1,
+    options.detail = options.detail || 1;
     options.altKey = !!options.altKey;
     options.ctrlKey = !!options.ctrlKey;
     options.shiftKey = !!options.shiftKey;

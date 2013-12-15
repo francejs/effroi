@@ -233,7 +233,7 @@ function Mouse() {
       dispatched;
     this.scroll(x, y, options);
     if(!targetElement) {
-      throw Error('Couldn\'t perform the move. Coordinnates seems invalid.')
+      throw Error('Couldn\'t perform the move. Coordinnates seems invalid.');
     }
     if(curElement===targetElement) {
       return false;
@@ -351,7 +351,7 @@ function Mouse() {
     options.canBubble = ('false' === options.canBubble ? false : true);
     options.cancelable = ('false' === options.cancelable ? false : true);
     options.view = options.view || window;
-    options.detail = options.detail || 1,
+    options.detail = options.detail || 1;
     options.altKey = !!options.altKey;
     options.ctrlKey = !!options.ctrlKey;
     options.shiftKey = !!options.shiftKey;
@@ -409,6 +409,6 @@ function Mouse() {
     }
   };
 
-};
+}
 
 module.exports = new Mouse();

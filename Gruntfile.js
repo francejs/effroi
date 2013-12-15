@@ -4,6 +4,22 @@ module.exports = function(grunt) {
     
     grunt.initConfig({
         clean: ['dist'],
+
+        jshint: {
+          all: {
+            src: ['Gruntfile.js', 'src/**/*.js'],
+            options: {
+  /*            curly: true,
+              eqeqeq: true,
+              eqnull: true,
+              browser: true,
+              globals: {
+                jQuery: true
+              },*/
+              '-W014': true
+            }
+          }
+        },
         
         browserify: {
             lib: {
@@ -29,7 +45,7 @@ module.exports = function(grunt) {
         watch: {
             code: {
                 files: ['src/**/*.js'],
-                tasks: ['dist']
+                tasks: ['jshint', 'dist']
             }
         },
 
@@ -57,6 +73,10 @@ module.exports = function(grunt) {
     grunt.registerTask('test', [
         'dist',
         'parallel:testing'
+    ]);
+
+    grunt.registerTask('hint', [
+        'jshint'
     ]);
 
     grunt.registerTask('default', [

@@ -22,11 +22,11 @@ function Element(selector) {
 
     this.click = function click() {
         return mouse.click(this.element);
-    }
+    };
 
     this.dblclick = function dblclick() {
         return mouse.dblclick(this.element);
-    }
+    };
 }
 
 module.exports = function element(selector) {

@@ -78,6 +78,14 @@ function Focus() {
   * @return Boolean
   */
   this.blur = function blur(options) {
+    function blurListener(evt) {
+      blurEventFired = true;
+      activeElement.removeEventListener(evt.type, blurListener);
+    }
+    function focusoutListener(evt) {
+      focusoutEventFired = true;
+      activeElement.removeEventListener(evt.type, focusoutListener);
+    }
     var activeElement = document.activeElement,
       blurEventFired = false,
       focusoutEventFired = false;
@@ -94,15 +102,7 @@ function Focus() {
       }
       options.relatedTarget = options.relatedTarget || null;
       // Registering listeners to check that events are fired
-      function blurListener(evt) {
-        blurEventFired = true;
-        activeElement.removeEventListener(evt.type, blurListener);
-      }
       activeElement.addEventListener(this.EVENT_BLUR, blurListener);
-      function focusoutListener(evt) {
-        focusoutEventFired = true;
-        activeElement.removeEventListener(evt.type, focusoutListener);
-      }
       activeElement.addEventListener(this.EVENT_FOCUSOUT, focusoutListener);
       // Calling the blur method
       activeElement.blur();
@@ -175,12 +175,12 @@ function Focus() {
         
       }
       return element.dispatchEvent(event);
-    } catch(e) {
+    } catch(err) {
       // old IE fallback
       event = document.createEventObject();
       event.eventType = options.type;
       event.relatedTarget = options.relatedTarget;
-      return element.fireEvent('on'+type, event)
+      return element.fireEvent('on'+type, event);
     }
   };
 

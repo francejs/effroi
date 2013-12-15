@@ -403,7 +403,7 @@ function Keyboard() {
         }) && dispatched;
     }
     return dispatched;
-  }
+  };
 
   /**
   * Push somes keys of the keyboard.
@@ -445,7 +445,7 @@ function Keyboard() {
       }
     }
     return dispatched;
-  }
+  };
 
   /**
   * Dispatches a keyboard event to the given DOM element.
@@ -471,7 +471,7 @@ function Keyboard() {
     } else if(1 === options.key.length) {
       char = options.key;
     } else {
-      throw Error('Unknown key value "'+key+'".')
+      throw Error('Unknown key value "'+key+'".');
     }
     charCode = char ? char.charCodeAt(0) : 0;
     keyCode = this.KEY_TO_CHARCODE[options.key] || charCode;
@@ -545,7 +545,7 @@ function Keyboard() {
         return element.fireEvent('on'+options.type, event);
       }
     }
-  }
+  };
 
 }
 
