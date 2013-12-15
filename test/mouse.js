@@ -557,7 +557,7 @@ describe("Mouse device", function() {
             assert.equal(evts[1].currentTarget, elt.lastChild.firstChild);
         });
 
-        it("should set the newly  under cursor element", function() {
+        it("should set the old under cursor element", function() {
             assert.equal(evts[1].relatedTarget, elt.firstChild.firstChild);
         });
 
@@ -860,6 +860,25 @@ describe("Mouse device", function() {
 
         it("set the selection end correctly", function() {
           assert.equal(elt.firstChild.firstChild.lastChild.selectionEnd, 8);
+        });
+
+    });
+
+    describe("moving to an element outside the screen", function() {
+
+        before(function() {
+            var html = '<p><label>Text: <input type="text" value="booooooob" /></label></p>'
+              , i = 10;
+            while(i--) {
+              html = html + html;
+            }
+            init(html);
+        });
+
+        after(uninit);
+
+        it("should return true", function() {
+          assert.equal(mouse.moveTo(elt.lastChild.lastChild), true);
         });
 
     });

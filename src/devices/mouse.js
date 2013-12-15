@@ -229,21 +229,24 @@ function Mouse() {
   */
   this.move = function move(x, y, options) {
     var curElement = document.elementFromPoint(_x, _y),
-      targetElement = document.elementFromPoint(x, y),
+      targetElement,
+      oldScrollX = window.scrollX,
+      oldScrollY = window.scrollY,
       dispatched;
+    // Could move the cursor of %n px and repeat mouseover/out events
+    // killer feature or overkill ?
+    options = options || {};
+    options.type = 'mouseout';
+    dispatched = this.dispatch(curElement, options);
     this.scroll(x, y, options);
+    targetElement = document.elementFromPoint(x + oldScrollX - window.scrollX,
+      y + oldScrollY - window.scrollY);
     if(!targetElement) {
       throw Error('Couldn\'t perform the move. Coordinnates seems invalid.');
     }
     if(curElement===targetElement) {
       return false;
     }
-    // Could move the cursor of %n px and repeat mouseover/out events
-    // killer feature or overkill ?
-    options = options || {};
-    options.type = 'mouseout';
-    options.relatedTarget = targetElement;
-    dispatched = this.dispatch(curElement, options);
     options.type = 'mouseover';
     options.relatedTarget = curElement;
     dispatched = this.dispatch(targetElement, options);
@@ -260,6 +263,9 @@ function Mouse() {
   */
   this.moveTo = function moveTo(element, options) {
     var c = utils.getElementCenter(element);
+    // We are giving the related target to avoid calculating it later
+    options = options || {};
+    options.relatedTarget = element;
     return this.move(c.x, c.y, options);
   };
 
